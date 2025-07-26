@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Antrian Surat Izin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        input[type="file"] { display: none; }
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .submenu.open {
+            max-height: 500px; /* Cukup besar untuk menampilkan semua item */
+        }
+        .menu-item.active {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+        }
+        .dark .menu-item.active {
+            background-color: #1e293b;
+            color: #e2e8f0;
+        }
+        .menu-item.active svg.arrow {
+            transform: rotate(90deg);
+        }
+        /* Animated Brand */
+        .animated-brand {
+            background: linear-gradient(90deg, #38bdf8, #3b82f6, #8b5cf6, #ec4899);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-animation 5s ease infinite;
+        }
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        /* Dark Theme */
+        .dark, .dark body { background-color: #0f172a; color: #cbd5e1; }
+        .dark aside { background-color: #1e293b; border-color: #334155; }
+        .dark main { background-color: #0f172a; }
+        .dark h1, .dark h2, .dark .font-semibold { color: #f1f5f9; }
+        .dark p, .dark label, .dark .text-slate-700 { color: #94a3b8; }
+        .dark .menu-item { color: #cbd5e1; }
+        .dark .menu-item:hover { background-color: #334155; }
+        .dark #submenu-database button, .dark #submenu-database label { color: #94a3b8; }
+        .dark #submenu-database button:hover, .dark #submenu-database label:hover { background-color: #334155; }
+        .dark #search-form { background-color: #1e293b; border-color: #334155;}
+        .dark input, .dark select { background-color: #334155; border-color: #475569; color: #f1f5f9; }
+        .dark input::placeholder { color: #64748b; }
+        .dark input:disabled { background-color: #334155; opacity: 0.5; }
+        .dark #kelas { background-color: #0f172a; }
+        .dark #queue-container { background-color: #1e293b; border-color: #334155; }
+        .dark #queue-container tr { border-color: #334155; }
+        .dark #queue-container thead { background-color: #334155; }
+        .dark #queue-container tbody tr { background-color: #1e293b; }
+        .dark #queue-container tbody tr:hover { background-color: #334155; }
+        .dark .text-slate-800 { color: #f1f5f9; }
+        .dark .text-slate-900 { color: #f8fafc; }
+        .dark #manual-add-modal > div, .dark #confirm-modal > div, .dark #settings-modal > div { background-color: #1e293b; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <div class="flex min-h-screen">
+        <aside class="w-96 bg-white p-6 border-r border-slate-200 flex flex-col flex-shrink-0 h-screen">
+            <p class="text-xs font-extrabold tracking-widest uppercase animated-brand mb-4">Madda Soft Production</p>
+            <h1 class="text-2xl font-bold mb-1">Aplikasi Izin Siswa</h1>
+            <p id="active-date-display" class="text-sm text-slate-500 mb-6">Selasa, 8 Juli 2025</p>
+            
+            <nav class="space-y-2">
+                <button id="menu-database" class="menu-item w-full flex items-center justify-between p-3 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+                    <span class="font-semibold">Database Siswa</span>
+                    <svg class="arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <ul id="submenu-database" class="submenu space-y-1 mt-1 pl-4">
+                    <li><button id="open-manual-add-modal" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>Tambah Siswa Baru</span></button></li>
+                    <li>
+                        <label for="csv-file-input" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm block cursor-pointer flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg><span>Impor dari .XLSX</span></label>
+                        <input type="file" id="csv-file-input" accept=".xlsx">
+                    </li>
+                    <li><button id="download-template-button" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span>Unduh Template XLSX</span></button></li>
+                    <li><button id="delete-database-button" class="w-full text-left p-2 rounded-md text-red-600 hover:bg-red-50 text-sm flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg><span>Hapus Database</span></button></li>
+                </ul>
+
+                <div class="pt-4">
+                    <h2 class="font-semibold text-slate-700 p-3">Cari & Tambah Antrian</h2>
+                    <form id="search-form" class="space-y-3 relative p-3">
+                        <div>
+                            <label for="search-nama" class="block text-xs font-medium text-slate-600">Nama Siswa</label>
+                            <input type="text" id="search-nama" name="nama" autocomplete="off" placeholder="Ketik nama..." class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 disabled:bg-slate-50">
+                            <div id="autocomplete-results" class="absolute z-10 w-full bg-white border border-slate-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg hidden"></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="kelas" class="block text-xs font-medium text-slate-600">Kelas</label>
+                                <input type="text" id="kelas" name="kelas" readonly class="mt-1 block w-full px-3 py-2 bg-slate-100 border-slate-300 rounded-md text-sm">
+                            </div>
+                             <div>
+                                <label for="wali" class="block text-xs font-medium text-slate-600">Nama Orang Tua / Wali</label>
+                                <input type="text" id="wali" name="wali" required placeholder="Nama Wali" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="keterangan" class="block text-xs font-medium text-slate-600">Keterangan</label>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <select id="keterangan" name="keterangan" class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500">
+                                    <option>Sakit</option>
+                                    <option>Izin</option>
+                                </select>
+                                <button type="submit" id="add-button" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 disabled:bg-indigo-300 whitespace-nowrap">
+                                    + Tambah
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </nav>
+            
+            <div class="mt-auto flex justify-between items-center text-xs text-slate-400 pt-4 border-t">
+                <span id="database-info">Database kosong.</span>
+                <button id="open-settings-modal" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-grow bg-slate-50 p-8 flex flex-col h-screen">
+             <div class="flex justify-between items-center mb-4">
+                <h2 id="queue-title" class="text-xl font-semibold">Daftar Antrian</h2>
+                <div class="flex items-center space-x-4">
+                    <button id="reset-queue-button" class="text-sm text-orange-600 hover:text-orange-800 font-semibold">Hapus Data Hari Ini</button>
+                    <button id="print-pdf-button" class="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 text-sm">Cetak Laporan</button>
+                    <button id="print-slips-button" class="bg-emerald-600 text-white font-bold py-2 px-5 rounded-md hover:bg-emerald-700 text-sm">Cetak Izin Siswa</button>
+                </div>
+            </div>
+            <div id="queue-container" class="flex-grow overflow-y-auto bg-white rounded-lg border border-slate-200 shadow-sm">
+                </div>
+            <footer class="text-center text-xs text-slate-400 pt-4">
+                Design & Creative 2025 By : Madda soft Feat Gemini
+            </footer>
+        </main>
+    </div>
+
+    <div id="manual-add-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Tambah Siswa Baru ke Database</h2>
+                <button id="close-manual-add-modal-button" class="text-slate-500 hover:text-slate-800">&times;</button>
+            </div>
+            <form id="manual-add-form" class="space-y-4">
+                   <p class="text-sm text-slate-600">Siswa yang ditambahkan di sini akan langsung bisa dicari.</p>
+                   <div>
+                       <label for="manual-nama" class="block text-sm font-medium text-slate-700">Nama Siswa Baru</label>
+                       <input type="text" id="manual-nama" placeholder="Nama Lengkap" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
+                   </div>
+                   <div>
+                       <label for="manual-kelas" class="block text-sm font-medium text-slate-700">Kelas</label>
+                       <input type="text" id="manual-kelas" placeholder="Contoh: 9A" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
+                   </div>
+                   <button type="submit" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700">Tambah ke Database</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h3 id="confirm-title" class="text-lg font-bold mb-4">Konfirmasi Aksi</h3>
+            <p id="confirm-message" class="text-sm text-slate-600 mb-6">Apakah Anda yakin?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="confirm-cancel-btn" class="px-4 py-2 rounded-md text-sm font-medium bg-slate-100 hover:bg-slate-200">Batal</button>
+                <button id="confirm-ok-btn" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Pengaturan</h2>
+                <button id="close-settings-modal-button" class="text-slate-500 hover:text-slate-800">&times;</button>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="font-semibold mb-2">Pengaturan Tanggal Laporan</h3>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="date-setting" value="auto" checked>
+                            <span>Otomatis (Hari Ini)</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="date-setting" value="manual">
+                            <span>Manual</span>
+                        </label>
+                    </div>
+                    <input type="date" id="manual-date-input" class="mt-2 w-full p-2 border rounded-md hidden">
+                </div>
+                <div>
+                    <h3 class="font-semibold mb-2">Tema Tampilan</h3>
+                     <div class="flex items-center space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="theme-setting" value="light" checked>
+                            <span>Cerah</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="theme-setting" value="dark">
+                            <span>Gelap</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function initializeApp() {
+        // --- STATE MANAGEMENT ---
+        let studentDatabase = [];
+        let printQueue = [];
+        let selectedStudent = null;
+        let onConfirmCallback = null;
+        let activeDate = new Date();
+        let dateMode = 'auto'; // 'auto' or 'manual'
+        let currentTheme = localStorage.getItem('appTheme') || 'light'; // Simpan tema di localStorage
+
+        // --- DOM ELEMENTS ---
+        const appTitle = document.querySelector('h1');
+        const appVersion = document.querySelector('p.text-sm.text-slate-500');
+        const activeDateDisplay = document.getElementById('active-date-display');
+        const menuDatabase = document.getElementById('menu-database');
+        const submenuDatabase = document.getElementById('submenu-database');
+        const fileInput = document.getElementById('csv-file-input'); // Tetap nama ID ini dari kode Anda
+        const downloadTemplateButton = document.getElementById('download-template-button');
+        const deleteDatabaseButton = document.getElementById('delete-database-button');
+        const databaseInfo = document.getElementById('database-info');
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-nama');
+        const classInput = document.getElementById('kelas');
+        const waliInput = document.getElementById('wali');
+        const reasonSelect = document.getElementById('keterangan');
+        const addButton = document.getElementById('add-button');
+        const autocompleteResults = document.getElementById('autocomplete-results');
+        const queueTitle = document.getElementById('queue-title');
+        const queueContainer = document.getElementById('queue-container');
+        const resetQueueButton = document.getElementById('reset-queue-button');
+        const printPdfButton = document.getElementById('print-pdf-button');
+        const printSlipsButton = document.getElementById('print-slips-button');
+        
+        const manualAddForm = document.getElementById('manual-add-form');
+        const openManualAddModalBtn = document.getElementById('open-manual-add-modal');
+        const manualAddModal = document.getElementById('manual-add-modal');
+        const closeModalBtn = document.getElementById('close-manual-add-modal-button');
+
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmTitle = document.getElementById('confirm-title');
+        const confirmMessage = document.getElementById('confirm-message');
+        const confirmOkBtn = document.getElementById('confirm-ok-btn');
+        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+
+        const openSettingsModalBtn = document.getElementById('open-settings-modal');
+        const settingsModal = document.getElementById('settings-modal');
+        const closeSettingsModalBtn = document.getElementById('close-settings-modal-button');
+        const dateSettingRadios = document.querySelectorAll('input[name="date-setting"]');
+        const manualDateInput = document.getElementById('manual-date-input');
+        const themeSettingRadios = document.querySelectorAll('input[name="theme-setting"]');
+        
+        // --- INITIAL UI STATE ---
+        function setInitialUIState() {
+            if (appTitle) appTitle.textContent = "Aplikasi Izin Siswa";
+            if (appVersion) appVersion.textContent = "Versi 2.1 (XLSX Support)"; // Perbarui versi
+            if (searchInput) searchInput.disabled = true;
+            if (addButton) addButton.disabled = true;
+            
+            applyTheme(currentTheme);
+            updateDateDisplay();
+            renderQueue();
+            loadDataFromLocalStorage(); // Muat data saat inisialisasi
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderQueue() {
+            if (!queueContainer || !queueTitle) return;
+            queueContainer.innerHTML = '';
+            queueTitle.textContent = `Daftar Antrian (${printQueue.length} Siswa)`;
+            if (printQueue.length === 0) {
+                queueContainer.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-base text-slate-400">Antrian kosong.</p></div>`;
+                return;
+            }
+            
+            const table = document.createElement('table');
+            table.className = 'w-full text-sm text-left text-slate-500';
+            table.innerHTML = `
+                <thead class="text-xs text-slate-700 uppercase bg-slate-100 sticky top-0 dark:bg-slate-700 dark:text-slate-300">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 w-12">No</th>
+                        <th scope="col" class="px-6 py-3">Nama Siswa</th>
+                        <th scope="col" class="px-6 py-3">Kelas</th>
+                        <th scope="col" class="px-6 py-3">Orang Tua/Wali</th>
+                        <th scope="col" class="px-6 py-3">Keterangan</th>
+                        <th scope="col" class="px-6 py-3 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="queue-table-body"></tbody>
+            `;
+            
+            const tableBody = table.querySelector('#queue-table-body');
+            printQueue.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-slate-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-slate-900">${index + 1}</td>
+                    <td class="px-6 py-4 font-semibold text-slate-800">${student.name}</td>
+                    <td class="px-6 py-4">${student.class}</td>
+                    <td class="px-6 py-4">${student.wali}</td>
+                    <td class="px-6 py-4"><span class="font-medium text-amber-600">${student.reason}</span></td>
+                    <td class="px-6 py-4 text-center">
+                        <button data-index="${index}" class="remove-queue-btn text-red-500 hover:text-red-700 font-semibold">Hapus</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            queueContainer.appendChild(table);
+        }
+        
+        // --- MODAL & NOTIFICATION LOGIC ---
+        function showConfirmation(title, message, onConfirm) {
+            if (!confirmModal || !confirmTitle || !confirmMessage) return;
+            confirmTitle.textContent = title;
+            confirmMessage.textContent = message;
+            onConfirmCallback = onConfirm;
+            confirmModal.classList.remove('hidden');
+            confirmModal.classList.add('flex');
+        }
+
+        function hideConfirmation() {
+            if (!confirmModal) return;
+            confirmModal.classList.add('hidden');
+            confirmModal.classList.remove('flex');
+            onConfirmCallback = null;
+        }
+
+        // --- DATA PERSISTENCE (localStorage) ---
+        function saveDataToLocalStorage() {
+            localStorage.setItem('studentDatabase', JSON.stringify(studentDatabase));
+            localStorage.setItem('printQueue', JSON.stringify(printQueue));
+            console.log("Data saved to localStorage.");
+        }
+
+        function loadDataFromLocalStorage() {
+            const storedStudents = localStorage.getItem('studentDatabase');
+            const storedQueue = localStorage.getItem('printQueue');
+
+            if (storedStudents) {
+                try {
+                    studentDatabase = JSON.parse(storedStudents);
+                    updateDatabaseInfo();
+                } catch (e) {
+                    console.error("Error parsing studentDatabase from localStorage", e);
+                    studentDatabase = []; // Reset jika ada error
+                }
+            }
+            if (storedQueue) {
+                try {
+                    printQueue = JSON.parse(storedQueue);
+                    renderQueue();
+                } catch (e) {
+                    console.error("Error parsing printQueue from localStorage", e);
+                    printQueue = []; // Reset jika ada error
+                }
+            }
+            console.log("Data loaded from localStorage.");
+        }
+
+        // --- CORE LOGIC ---
+        function generateSlipsPDF() {
+            if (printQueue.length === 0) {
+                alert("Daftar antrian kosong. Tidak ada data untuk dicetak.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            const panelW = pageW / 3;
+            const panelH = pageH / 2;
+            const margin = 8; // Margin dalam setiap panel
+
+            const drawSlip = (x, y, student) => {
+                // Gambar garis tepi panel
+                doc.setDrawColor(150, 150, 150); // Warna abu-abu
+                doc.rect(x, y, panelW, panelH);
+
+                const contentX = x + margin;
+                const contentY = y + margin;
+                const contentW = panelW - (margin * 2);
+                let currentY = contentY;
+
+                // Judul
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                const title = "SURAT IJIN TIDAK MASUK SEKOLAH";
+                const titleWidth = doc.getTextWidth(title);
+                doc.text(title, x + (panelW / 2), currentY, { align: 'center' });
+                // Garis bawah judul
+                const underlineY = currentY + 1;
+                doc.setLineWidth(0.5);
+                doc.line(x + (panelW / 2) - (titleWidth / 2), underlineY, x + (panelW / 2) + (titleWidth / 2), underlineY);
+                currentY += 8;
+
+                // Paragraf 1
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'normal');
+                const p1 = "Surat ini menerangkan bahwa siswa tersebut dibawah ini telah diijinkan oleh orangtua/walinya untuk tidak masuk sekolah.";
+                doc.text(p1, contentX, currentY, { maxWidth: contentW });
+                currentY += 15;
+
+                // Data Siswa
+                doc.text("Nama", contentX, currentY);
+                doc.text(`: ${student.name}`, contentX + 20, currentY);
+                currentY += 6;
+                doc.text("Kelas", contentX, currentY);
+                doc.text(`: ${student.class}`, contentX + 20, currentY);
+                currentY += 6;
+                doc.text("Keterangan", contentX, currentY);
+                doc.text(`: ${student.reason}`, contentX + 20, currentY);
+                currentY += 12;
+
+                // Paragraf 2
+                const p2 = "Mohon diteruskan kepada petugas presensi untuk dilaksanakan. Terima kasih.";
+                doc.text(p2, contentX, currentY, { maxWidth: contentW });
+
+                // Tanda Tangan
+                const signX = x + panelW - margin;
+                const signY = y + panelH - margin;
+                const formattedDate = activeDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                
+                doc.text(`Jatirogo, ${formattedDate}`, signX, signY - 20, { align: 'right' });
+                doc.text("Petugas,", signX, signY - 15, { align: 'right' });
+                doc.text("Meri Wahyudi", signX, signY, { align: 'right' });
+            };
+
+            printQueue.forEach((student, index) => {
+                const pageIndex = Math.floor(index / 6);
+                if (pageIndex > 0 && index % 6 === 0) {
+                    doc.addPage();
+                }
+                
+                const slipIndexOnPage = index % 6;
+                const col = slipIndexOnPage % 3;
+                const row = Math.floor(slipIndexOnPage / 3);
+
+                const x = col * panelW;
+                const y = row * panelH;
+
+                drawSlip(x, y, student);
+            });
+            
+            const fileName = `surat-izin-${activeDate.toISOString().slice(0,10)}.pdf`;
+            doc.output('dataurlnewwindow');
+        }
+
+        function generateReportPDF() {
+            if (printQueue.length === 0) {
+                alert("Daftar antrian kosong. Tidak ada data untuk dicetak.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            const tableColumn = ["No", "Nama Siswa", "Kelas", "Orang Tua/Wali", "Keterangan"];
+            const tableRows = printQueue.map((student, index) => [
+                index + 1, student.name, student.class, student.wali, student.reason
+            ]);
+            
+            const formattedDate = activeDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            const docTitle = "Laporan Ijin Siswa";
+            const dateSubTitle = `Tanggal: ${formattedDate}`;
+            const fileName = `laporan-izin-${activeDate.toISOString().slice(0,10)}.pdf`;
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            doc.setFontSize(18);
+            doc.text(docTitle, pageWidth / 2, 15, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(dateSubTitle, pageWidth / 2, 22, { align: 'center' });
+
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 30,
+                theme: 'grid',
+                headStyles: { fillColor: [241, 245, 249], textColor: [20, 20, 20] },
+                styles: { font: 'Inter', fontSize: 12 }, // Ukuran font diubah ke 12
+                margin: { top: 10, right: 10, bottom: 10, left: 10 }
+            });
+            
+            doc.output('dataurlnewwindow');
+        }
+
+        // Fungsi BARU untuk mengunduh template XLSX
+        function downloadTemplate() {
+            // Data header untuk template
+            const headers = [
+                "Nama",
+                "Kelas",
+                "Wali",
+                "Nomor HP Wali"
+            ];
+
+            // Buat array data. Baris pertama adalah header.
+            // Anda bisa menambahkan baris contoh jika mau, misalnya:
+            // const data = [
+            //     headers,
+            //     ["Budi Santoso", "10A", "Ibu Ani", "081234567890"],
+            //     ["Siti Aminah", "11B", "Bapak Budi", "087654321098"]
+            // ];
+            // Untuk template kosong, cukup headers saja:
+            const data = [headers];
+
+            // Buat worksheet dari array data
+            const ws = XLSX.utils.aoa_to_sheet(data);
+
+            // Buat workbook baru
+            const wb = XLSX.utils.book_new();
+            // Tambahkan worksheet ke workbook dengan nama 'Data Siswa'
+            XLSX.utils.book_append_sheet(wb, ws, "Data Siswa");
+
+            // Tulis file XLSX dan unduh
+            XLSX.writeFile(wb, "template_data_siswa.xlsx");
+
+            alert('Template Excel "template_data_siswa.xlsx" berhasil diunduh.');
+        }
+        
+        // Fungsi handleFileUpload yang diubah untuk XLSX
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                alert('Tidak ada file yang dipilih.');
+                event.target.value = ''; // Reset input file
+                return;
+            }
+
+            const fileName = file.name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            if (fileExtension !== 'xlsx') {
+                alert('Harap unggah file Excel dengan ekstensi .xlsx.');
+                event.target.value = ''; // Reset input file
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                const sheetName = workbook.SheetNames[0]; // Ambil sheet pertama
+                const worksheet = workbook.Sheets[sheetName];
+
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+
+                if (jsonData.length < 2) { // Minimal ada header dan satu baris data
+                    alert('File Excel kosong atau tidak memiliki data yang cukup.');
+                    event.target.value = '';
+                    return;
+                }
+
+                const headers = jsonData[0]; // Baris pertama adalah header
+                const studentsDataRows = jsonData.slice(1); // Data siswa dimulai dari baris kedua
+
+                // VALIDASI HEADER: Pastikan nama header di sini SAMA PERSIS dengan template Anda!
+                const requiredHeaders = ['Nama', 'Kelas', 'Wali', 'Nomor HP Wali'];
+                const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+
+                if (missingHeaders.length > 0) {
+                    alert(`File Excel tidak memiliki kolom yang diperlukan: ${missingHeaders.join(', ')}. Harap gunakan template yang benar.`);
+                    event.target.value = '';
+                    return;
+                }
+
+                const newStudents = [];
+                let duplicatesFound = 0;
+                // Buat Set dari nama siswa yang sudah ada di database (case-insensitive)
+                const seenNamesInDatabase = new Set(studentDatabase.map(s => s.name.toLowerCase()));
+
+                studentsDataRows.forEach(row => {
+                    // Ambil nilai berdasarkan indeks header
+                    const nameIndex = headers.indexOf('Nama');
+                    const classIndex = headers.indexOf('Kelas');
+                    const waliIndex = headers.indexOf('Wali');
+                    const nomorHpWaliIndex = headers.indexOf('Nomor HP Wali');
+
+                    const name = row[nameIndex] ? String(row[nameIndex]).trim() : '';
+                    const studentClass = row[classIndex] ? String(row[classIndex]).trim() : '';
+                    const wali = row[waliIndex] ? String(row[waliIndex]).trim() : '';
+                    const nomorHpWali = row[nomorHpWaliIndex] ? String(row[nomorHpWaliIndex]).trim() : '';
+
+                    // Validasi dasar: nama dan kelas tidak boleh kosong
+                    if (name && studentClass) {
+                        // Cek duplikat di antara data yang sedang diimpor dan yang sudah ada
+                        if (!seenNamesInDatabase.has(name.toLowerCase())) {
+                            seenNamesInDatabase.add(name.toLowerCase()); // Tambahkan ke set agar tidak duplikat dari file yang sama
+                            newStudents.push({
+                                name: name,
+                                class: studentClass,
+                                wali: wali, // Sertakan data wali
+                                nomorHpWali: nomorHpWali // Sertakan nomor HP wali
+                            });
+                        } else {
+                            duplicatesFound++;
+                        }
+                    }
+                });
+
+                if (newStudents.length > 0) {
+                    // Gabungkan siswa baru dengan database yang sudah ada
+                    studentDatabase = [...studentDatabase, ...newStudents];
+                    saveDataToLocalStorage(); // Simpan perubahan ke localStorage
+                    updateDatabaseInfo(); // Perbarui info tampilan database
+                    alert(`Berhasil mengimpor ${newStudents.length} siswa baru dari file Excel.`);
+                    if (duplicatesFound > 0) {
+                        alert(`${duplicatesFound} data duplikat (nama yang sama) diabaikan.`);
+                    }
+                } else {
+                    alert('Tidak ada siswa valid yang ditemukan di file Excel untuk diimpor.');
+                }
+                event.target.value = ''; // Reset input file setelah proses
+            };
+
+            reader.onerror = function(ex) {
+                alert('Gagal membaca file. Pastikan format file Excel Anda benar.');
+                console.error('File Reader Error:', ex);
+                event.target.value = ''; // Reset input file
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            if (!autocompleteResults) return;
+            autocompleteResults.innerHTML = '';
+            if (query.length < 1) {
+                autocompleteResults.classList.add('hidden');
+                // Optional: clear inputs if search query is empty
+                if (classInput) classInput.value = '';
+                if (waliInput) waliInput.value = '';
+                selectedStudent = null;
+                if (addButton) addButton.disabled = true;
+                return;
+            }
+            const matches = studentDatabase.filter(s => s.name.toLowerCase().includes(query)).slice(0, 10);
+            if (matches.length > 0) {
+                autocompleteResults.classList.remove('hidden');
+                matches.forEach(match => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item p-2 hover:bg-sky-500 hover:text-white cursor-pointer';
+                    item.textContent = `${match.name} (${match.class})`;
+                    item.dataset.name = match.name;
+                    item.dataset.class = match.class;
+                    // Simpan data wali dan nomor HP jika ada untuk ditampilkan saat dipilih
+                    if (match.wali) item.dataset.wali = match.wali;
+                    // if (match.nomorHpWali) item.dataset.nomorHpWali = match.nomorHpWali;
+                    autocompleteResults.appendChild(item);
+                });
+            } else {
+                autocompleteResults.classList.add('hidden');
+            }
+        }
+        
+        function selectStudentFromSearch(student) {
+            selectedStudent = student;
+            if (searchInput) searchInput.value = student.name;
+            if (classInput) classInput.value = student.class;
+            if (waliInput) waliInput.value = student.wali || ''; // Tampilkan wali jika ada
+            if (autocompleteResults) autocompleteResults.classList.add('hidden');
+            if (addButton) addButton.disabled = false;
+        }
+
+        function addToQueue(event) {
+            event.preventDefault();
+            if (!selectedStudent) { alert('Pilih siswa dari hasil pencarian terlebih dahulu.'); return; }
+            const waliName = waliInput.value.trim();
+            if(!waliName) { alert('Nama Orang Tua / Wali harus diisi.'); return; }
+            const isAlreadyInQueue = printQueue.some(student => student.name.toLowerCase() === selectedStudent.name.toLowerCase());
+            if (isAlreadyInQueue) {
+                alert(`Siswa bernama "${selectedStudent.name}" sudah ada di dalam antrian.`);
+                return;
+            }
+            printQueue.push({ ...selectedStudent, reason: reasonSelect.value, wali: waliName });
+            saveDataToLocalStorage(); // Simpan setelah menambah ke antrian
+            selectedStudent = null;
+            if (searchForm) searchForm.reset();
+            if (addButton) addButton.disabled = true;
+            renderQueue();
+            // Optional: Bersihkan kolom Kelas dan Wali setelah menambah
+            if (classInput) classInput.value = '';
+            if (waliInput) waliInput.value = '';
+        }
+
+        function removeFromQueue(index) {
+            printQueue.splice(index, 1);
+            saveDataToLocalStorage(); // Simpan setelah menghapus dari antrian
+            renderQueue();
+        }
+
+        function resetQueue() {
+            showConfirmation('Hapus Data Hari Ini?', 'Anda yakin ingin menghapus semua data antrian hari ini? Ini tidak akan menghapus database siswa.', () => {
+                printQueue = [];
+                saveDataToLocalStorage(); // Simpan setelah reset antrian
+                renderQueue();
+                alert('Data antrian hari ini telah dihapus.');
+            });
+        }
+
+        function deleteDatabase() {
+            showConfirmation('Hapus Seluruh Database?', 'PERINGATAN: Aksi ini tidak bisa dibatalkan. Seluruh data siswa yang dimuat akan hilang.', () => {
+                studentDatabase = [];
+                printQueue = []; // Juga reset antrian karena database dihapus
+                saveDataToLocalStorage(); // Simpan setelah menghapus database
+                if (searchInput) searchInput.value = '';
+                updateDatabaseInfo();
+                renderQueue(); // Render ulang antrian (sekarang kosong)
+                alert('Database telah dihapus.');
+            });
+        }
+
+        function addStudentToDatabase(event) {
+            event.preventDefault();
+            const newNameInput = document.getElementById('manual-nama');
+            const newClassInput = document.getElementById('manual-kelas');
+            if (!newNameInput || !newClassInput) return;
+            const newName = newNameInput.value.trim();
+            const newClass = newClassInput.value.trim();
+            if (!newName || !newClass) { alert('Nama dan Kelas siswa baru tidak boleh kosong.'); return; }
+            if (studentDatabase.some(s => s.name.toLowerCase() === newName.toLowerCase())) {
+                alert('Siswa dengan nama ini sudah ada di database.');
+                return;
+            }
+            studentDatabase.push({ name: newName, class: newClass, wali: '', nomorHpWali: '' }); // Tambahkan default wali/nomor hp
+            saveDataToLocalStorage(); // Simpan setelah menambah siswa manual
+            updateDatabaseInfo();
+            alert(`Siswa "${newName}" berhasil ditambahkan.`);
+            if (manualAddForm) manualAddForm.reset();
+            if (manualAddModal) manualAddModal.classList.add('hidden');
+        }
+
+        function updateDatabaseInfo() {
+            if (databaseInfo) databaseInfo.textContent = `${studentDatabase.length} siswa di database.`;
+            if (searchInput) {
+                searchInput.disabled = studentDatabase.length === 0;
+                if(studentDatabase.length > 0) searchInput.focus();
+            }
+        }
+        
+        function updateDateDisplay() {
+            if (!activeDateDisplay) return;
+            activeDateDisplay.textContent = activeDate.toLocaleDateString('id-ID', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            });
+        }
+        
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('appTheme', theme);
+            const themeRadio = document.querySelector(`input[name="theme-setting"][value="${theme}"]`);
+            if(themeRadio) themeRadio.checked = true;
+        }
+
+        // --- EVENT LISTENERS ---
+        if (menuDatabase) menuDatabase.addEventListener('click', () => {
+            if (submenuDatabase) submenuDatabase.classList.toggle('open');
+            menuDatabase.classList.toggle('active');
+        });
+        if (fileInput) fileInput.addEventListener('change', handleFileUpload);
+        if (downloadTemplateButton) downloadTemplateButton.addEventListener('click', downloadTemplate);
+        if (deleteDatabaseButton) deleteDatabaseButton.addEventListener('click', deleteDatabase);
+        if (searchInput) searchInput.addEventListener('input', handleSearch);
+        if (searchForm) searchForm.addEventListener('submit', addToQueue);
+        if (resetQueueButton) resetQueueButton.addEventListener('click', resetQueue);
+        if (printPdfButton) printPdfButton.addEventListener('click', generateReportPDF);
+        if (printSlipsButton) printSlipsButton.addEventListener('click', generateSlipsPDF);
+        
+        if (manualAddForm) manualAddForm.addEventListener('submit', addStudentToDatabase);
+        if (openManualAddModalBtn) openManualAddModalBtn.addEventListener('click', () => {
+            manualAddModal.classList.remove('hidden');
+            document.getElementById('manual-nama').focus(); // Fokus ke input pertama
+        });
+        if (closeModalBtn) closeModalBtn.addEventListener('click', () => manualAddModal.classList.add('hidden'));
+        if (manualAddModal) manualAddModal.addEventListener('click', (e) => {
+            if (e.target === manualAddModal) manualAddModal.classList.add('hidden');
+        });
+
+        if (queueContainer) queueContainer.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-queue-btn')) {
+                const index = parseInt(e.target.dataset.index, 10);
+                if (!isNaN(index)) removeFromQueue(index);
+            }
+        });
+        
+        if (autocompleteResults) autocompleteResults.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('autocomplete-item')) {
+                // Pastikan untuk mengambil semua data yang relevan dari dataset
+                const student = {
+                    name: e.target.dataset.name,
+                    class: e.target.dataset.class,
+                    wali: e.target.dataset.wali || '', // Ambil wali jika ada
+                    // nomorHpWali: e.target.dataset.nomorHpWali || '' // Jika ada
+                };
+                selectStudentFromSearch(student);
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (searchForm && !searchForm.contains(e.target) && autocompleteResults) {
+                autocompleteResults.classList.add('hidden');
+            }
+        });
+
+        if (confirmOkBtn) confirmOkBtn.addEventListener('click', () => {
+            if (typeof onConfirmCallback === 'function') {
+                onConfirmCallback();
+            }
+            hideConfirmation();
+        });
+        if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', hideConfirmation);
+
+        // Settings Modal Listeners
+        if(openSettingsModalBtn) openSettingsModalBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('hidden');
+            // Pastikan radio button yang benar terpilih saat modal dibuka
+            document.querySelector(`input[name="date-setting"][value="${dateMode}"]`).checked = true;
+            if (dateMode === 'manual') {
+                manualDateInput.classList.remove('hidden');
+            } else {
+                manualDateInput.classList.add('hidden');
+            }
+            document.querySelector(`input[name="theme-setting"][value="${currentTheme}"]`).checked = true;
+        });
+        if(closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        if(settingsModal) settingsModal.addEventListener('click', (e) => {
+            if(e.target === settingsModal) settingsModal.classList.add('hidden');
+        });
+
+        dateSettingRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                dateMode = e.target.value;
+                if (dateMode === 'manual') {
+                    manualDateInput.classList.remove('hidden');
+                    // Set manual date input to activeDate if it was previously auto, or current date if empty
+                    manualDateInput.valueAsDate = activeDate || new Date(); 
+                    activeDate = manualDateInput.valueAsDate; // Set activeDate ke manual date
+                } else {
+                    manualDateInput.classList.add('hidden');
+                    activeDate = new Date(); // Kembali ke tanggal hari ini
+                }
+                updateDateDisplay();
+            });
+        });
+        
+        if(manualDateInput) manualDateInput.addEventListener('change', (e) => {
+            const selectedDate = new Date(e.target.value);
+            // Tambahkan offset zona waktu untuk memastikan tanggal yang benar
+            const timezoneOffset = selectedDate.getTimezoneOffset() * 60000; 
+            activeDate = new Date(selectedDate.getTime() + timezoneOffset);
+            updateDateDisplay();
+        });
+        
+        themeSettingRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                currentTheme = e.target.value;
+                applyTheme(currentTheme);
+            });
+        });
+
+        // --- INITIALIZATION ---
+        setInitialUIState();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+        initializeApp();
+    }
+    </script>
+</body>
+</html>
