@@ -87,29 +87,34 @@
         .dark #queue-container tbody tr:hover { background-color: #334155; }
         .dark .text-slate-800 { color: #f1f5f9; }
         .dark .text-slate-900 { color: #f8fafc; }
-        .dark #manual-add-modal > div, .dark #confirm-modal > div, .dark #settings-modal > div, .dark #login-form-modal > div, .dark #employee-management-modal > div { background-color: #1e293b; }
-
+        .dark #manual-add-modal > div, .dark #confirm-modal > div, .dark #settings-modal > div, .dark #login-form-modal > div, .dark #employee-management-modal > div, .dark #change-password-modal > div { background-color: #1e293b; }
         /* Public View Specific Styles */
         #public-view {
-            background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
-            background-size: cover;
+            background-image: linear-gradient(to right top, #0f172a, #2a0f3a, #4a0f4a, #690f5a, #8b0f6a, #a0207a, #b5308a, #ca409a, #d050a0, #d660a6, #dc70ac, #e280b2); /* Darker, more neon gradient */
+            background-size: 200% 200%;
             animation: backgroundPan 15s ease infinite alternate;
-            overflow-y: auto; /* Enable scrolling for public view */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem; /* Add some padding to prevent content touching edges */
         }
         @keyframes backgroundPan {
             0% { background-position: 0% 50%; }
             100% { background-position: 100% 50%; }
         }
         .public-content {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(20, 20, 30, 0.9); /* Darker translucent background */
             border-radius: 1rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            width: 90%;
-            padding: 2.5rem;
-            text-align: center;
-            animation: fadeIn 1s ease-out;
-            margin: 2rem auto; /* Center and add vertical margin */
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.7), 0 0 30px rgba(0, 255, 255, 0.3); /* Neon glow effect */
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            padding: 4rem; /* Increased padding for full screen content */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Push header/footer to ends */
+            align-items: center; /* Center content horizontally */
+            overflow-y: auto; /* Allow scrolling if content overflows */
         }
         .dark .public-content {
             background-color: rgba(30, 41, 59, 0.9);
@@ -120,12 +125,13 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .public-header {
-            font-size: 2.5rem;
+            font-size: 3.5rem; /* Larger font size */
             font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #38bdf8, #8b5cf6);
+            margin-bottom: 2rem; /* More space */
+            background: linear-gradient(45deg, #00ffff, #ff00ff); /* Brighter neon gradient */
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.5); /* Text glow */
         }
         .public-description {
             font-size: 1.125rem;
@@ -136,69 +142,71 @@
             color: #94a3b8;
         }
         .public-info-section {
-            text-align: left;
+            text-align: center; /* Center section content */
             margin-top: 2rem;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px dashed rgba(0, 255, 255, 0.5); /* Dashed glowing border */
             padding-top: 2rem;
-            color: #334155;
+            color: #e0f2fe; /* Lighter text color */
         }
         .dark .public-info-section {
-            border-color: #334155;
-            color: #94a3b8;
+            border-color: rgba(0, 255, 255, 0.5);
+            color: #e0f2fe;
         }
         .public-info-section h3 {
-            font-size: 1.5rem;
+            font-size: 2rem; /* Larger heading */
             font-weight: 700;
-            margin-bottom: 1rem;
-            color: #1e293b;
+            margin-bottom: 1.5rem; /* More space */
+            color: #00ffff; /* Neon cyan */
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.6); /* Text glow */
         }
         .dark .public-info-section h3 {
-            color: #f1f5f9;
+            color: #00ffff;
         }
         .public-info-section p {
             margin-bottom: 0.75rem;
         }
         .public-queue-table-container {
-            max-height: 300px; /* Limit height for scrollability */
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(0, 255, 255, 0.3); /* Subtle glowing border */
             border-radius: 0.5rem;
             margin-top: 1rem;
+            background-color: rgba(0, 0, 0, 0.3); /* Darker table background */
         }
         .dark .public-queue-table-container {
-            border-color: #334155;
+            border-color: rgba(0, 255, 255, 0.3);
         }
         .public-queue-table th, .public-queue-table td {
             padding: 0.75rem 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1); /* Subtle border lines */
+            color: #e0f2fe; /* Lighter text color for table */
         }
         .dark .public-queue-table th, .dark .public-queue-table td {
-            border-color: #334155;
+            border-color: rgba(0, 255, 255, 0.1);
+            color: #e0f2fe;
         }
         .public-queue-table thead {
-            background-color: #f1f5f9;
-            color: #475569;
+            background-color: rgba(0, 255, 255, 0.1); /* Lighter translucent header */
+            color: #00ffff; /* Neon cyan for header text */
             text-transform: uppercase;
-            font-size: 0.75rem;
+            font-size: 0.85rem; /* Slightly larger font */
             position: sticky;
             top: 0;
             z-index: 10;
         }
         .dark .public-queue-table thead {
-            background-color: #334155;
-            color: #cbd5e1;
+            background-color: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
         }
         .public-queue-table tbody tr:nth-child(even) {
-            background-color: #f8fafc;
+            background-color: rgba(0, 0, 0, 0.2); /* Slightly different row background */
         }
         .dark .public-queue-table tbody tr:nth-child(even) {
-            background-color: #1e293b;
+            background-color: rgba(0, 0, 0, 0.2);
         }
         .public-queue-table tbody tr:hover {
-            background-color: #e2e8f0;
+            background-color: rgba(0, 255, 255, 0.15); /* Hover glow */
         }
         .dark .public-queue-table tbody tr:hover {
-            background-color: #475569;
+            background-color: rgba(0, 255, 255, 0.15);
         }
         .public-queue-empty-message-row td {
             padding: 1rem;
@@ -262,6 +270,12 @@
                 <ul id="submenu-employee-management" class="submenu space-y-1 mt-1 pl-4">
                     <li><button id="open-employee-management-modal" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2 dark:text-slate-400 dark:hover:bg-slate-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg><span>Kelola Pegawai</span></button></li>
                 </ul>
+
+                <!-- Change Password Menu Item -->
+                <button id="open-change-password-modal-btn" class="menu-item w-full flex items-center justify-between p-3 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors dark:text-slate-300 dark:hover:bg-slate-700">
+                    <span class="font-semibold">Ganti Password</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2v5a2 2 0 01-2 2h-5a2 2 0 01-2-2V9a2 2 0 012-2h5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9v-2a2 2 0 00-2-2H9a2 2 0 00-2 2v2"></path></svg>
+                </button>
 
 
                 <div class="pt-4">
@@ -477,6 +491,31 @@
         </div>
     </div>
 
+    <!-- Change Password Modal -->
+    <div id="change-password-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md dark:bg-slate-800">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold dark:text-slate-100">Ganti Password</h2>
+                <button id="close-change-password-modal-button" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">&times;</button>
+            </div>
+            <form id="change-password-form" class="space-y-4">
+                <div>
+                    <label for="current-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password Saat Ini</label>
+                    <input type="password" id="current-password" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <div>
+                    <label for="new-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password Baru</label>
+                    <input type="password" id="new-password" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <div>
+                    <label for="confirm-new-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Konfirmasi Password Baru</label>
+                    <input type="password" id="confirm-new-password" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700">Ganti Password</button>
+            </form>
+        </div>
+    </div>
+
     <script>
     // Ensure Firebase modules are loaded before initializing the app logic
     document.addEventListener('DOMContentLoaded', () => {
@@ -518,6 +557,11 @@
         let activeDate = new Date();
         let dateMode = 'auto';
         let currentTheme = localStorage.getItem('appTheme') || 'light';
+
+        // NEW: Variables for public queue carousel
+        let publicCurrentPage = 0;
+        const publicItemsPerPage = 10;
+        let publicQueueInterval = null;
 
         // --- DOM ELEMENTS ---
         const publicView = document.getElementById('public-view');
@@ -581,7 +625,7 @@
         const closeEmployeeManagementModalBtn = document.getElementById('close-employee-management-modal-button');
         const addEmployeeForm = document.getElementById('add-employee-form');
         const newEmployeeUsernameInput = document.getElementById('new-employee-username');
-        const newEmployeePasswordInput = document = document.getElementById('new-employee-password');
+        const newEmployeePasswordInput = document.getElementById('new-employee-password');
         const newEmployeeNameInput = document.getElementById('new-employee-name');
         const newEmployeeRoleSelect = document.getElementById('new-employee-role');
         const employeeTableBody = document.getElementById('employee-table-body');
@@ -590,6 +634,15 @@
         // Public View Specific Elements
         const publicQueueCount = document.getElementById('public-queue-count');
         const publicQueueSummaryContainer = document.getElementById('public-queue-summary-container');
+
+        // Change Password Modal Elements
+        const openChangePasswordModalBtn = document.getElementById('open-change-password-modal-btn');
+        const changePasswordModal = document.getElementById('change-password-modal');
+        const closeChangePasswordModalBtn = document.getElementById('close-change-password-modal-button');
+        const changePasswordForm = document.getElementById('change-password-form');
+        const currentPasswordInput = document.getElementById('current-password');
+        const newPasswordInput = document.getElementById('new-password');
+        const confirmNewPasswordInput = document.getElementById('confirm-new-password');
         
         // --- AUTHENTICATION LOGIC ---
         onAuthStateChanged(auth, (user) => {
@@ -601,6 +654,12 @@
                 
                 // Load student database (private to logged-in users)
                 loadStudentDatabaseFromLocalStorage(); 
+
+                // Stop public carousel when logged in
+                if (publicQueueInterval) {
+                    clearInterval(publicQueueInterval);
+                    publicQueueInterval = null;
+                }
 
                 // Show/hide employee management menu based on role
                 if (loggedInEmployee.role === 'admin') {
@@ -616,6 +675,8 @@
                     resetQueueButton.classList.add('hidden'); // Hide Reset Queue button for non-admin
                     printPdfButton.classList.add('hidden'); // Hide Print PDF button for non-admin
                 }
+                // Change Password menu is always visible for logged-in users
+                openChangePasswordModalBtn.classList.remove('hidden');
 
             } else {
                 userId = null;
@@ -628,8 +689,9 @@
                 saveStudentDatabaseToLocalStorage(); // Save empty student database
                 updateDatabaseInfo();
                 
-                // Re-render public queue summary when logged out
+                // Re-render public queue summary and start carousel when logged out
                 renderPublicQueueSummary(); 
+                startPublicQueueCarousel(); // Start carousel when logged out
 
                 menuEmployeeManagement.classList.add('hidden'); // Always hide for logged out users
                 submenuEmployeeManagement.classList.remove('open');
@@ -637,6 +699,7 @@
                 submenuDatabase.classList.remove('open');
                 resetQueueButton.classList.add('hidden'); // Always hide for logged out users
                 printPdfButton.classList.add('hidden'); // Always hide for logged out users
+                openChangePasswordModalBtn.classList.add('hidden'); // Hide change password for logged out users
             }
         });
 
@@ -686,6 +749,30 @@
             }
         }
 
+        // NEW: Function to advance public queue page
+        function advancePublicQueuePage() {
+            if (printQueue.length <= publicItemsPerPage) {
+                publicCurrentPage = 0; // Reset if less than or equal to one page
+                // Do not clear interval here, let it continue if there's only one page to display.
+                // It will just keep rendering the same page.
+                return;
+            }
+            const totalPages = Math.ceil(printQueue.length / publicItemsPerPage);
+            publicCurrentPage = (publicCurrentPage + 1) % totalPages;
+            renderPublicQueueSummary();
+        }
+
+        // NEW: Function to start public queue carousel
+        function startPublicQueueCarousel() {
+            if (publicQueueInterval) {
+                clearInterval(publicQueueInterval); // Clear any existing interval
+            }
+            // Start carousel only if there's more than one page of data
+            if (printQueue.length > publicItemsPerPage) {
+                publicQueueInterval = setInterval(advancePublicQueuePage, 5000); // Rotate every 5 seconds
+            }
+        }
+
         // --- INITIAL UI STATE ---
         function setInitialUIState() {
             if (appTitle) appTitle.textContent = "Aplikasi Izin Siswa";
@@ -705,8 +792,11 @@
             submenuEmployeeManagement.classList.remove('open'); // Ensure submenu is closed
             resetQueueButton.classList.add('hidden');
             printPdfButton.classList.add('hidden');
+            openChangePasswordModalBtn.classList.add('hidden'); // Hidden by default
 
+            simulateInitialData(); // Call simulation after loading existing data
             renderPublicQueueSummary(); // Render public queue on initial load
+            startPublicQueueCarousel(); // Start carousel on initial load (if applicable)
         }
 
         // --- RENDER FUNCTIONS ---
@@ -730,6 +820,7 @@
                         <th scope="col" class="px-6 py-3">Kelas</th>
                         <th scope="col" class="px-6 py-3">Orang Tua/Wali</th>
                         <th scope="col" class="px-6 py-3">Keterangan</th>
+                        <th scope="col" class="px-6 py-3">Ditambahkan Oleh</th> <!-- NEW COLUMN HEADER -->
                         <th scope="col" class="px-6 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -740,14 +831,27 @@
             printQueue.forEach((student, index) => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700';
+                
+                // Determine if the delete button should be enabled
+                let isDeleteEnabled = false;
+                if (loggedInEmployee && loggedInEmployee.role === 'admin') {
+                    isDeleteEnabled = true; // Admin can always delete
+                } else if (loggedInEmployee && student.addedByUsername === loggedInEmployee.username) {
+                    isDeleteEnabled = true; // User can delete their own entry
+                }
+
                 row.innerHTML = `
                     <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">${index + 1}</td>
                     <td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">${student.name}</td>
                     <td class="px-6 py-4">${student.class}</td>
                     <td class="px-6 py-4">${student.wali}</td>
                     <td class="px-6 py-4"><span class="font-medium text-amber-600">${student.reason}</span></td>
+                    <td class="px-6 py-4">${student.addedBy || '-'}</td> <!-- Display who added it -->
                     <td class="px-6 py-4 text-center">
-                        <button data-index="${index}" class="remove-queue-btn text-red-500 hover:text-red-700 font-semibold">Hapus</button>
+                        <button data-index="${index}" 
+                                data-added-by-username="${student.addedByUsername || ''}" 
+                                class="remove-queue-btn text-red-500 hover:text-red-700 font-semibold ${isDeleteEnabled ? '' : 'opacity-50 cursor-not-allowed'}" 
+                                ${isDeleteEnabled ? '' : 'disabled'}>Hapus</button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -757,7 +861,7 @@
             renderPublicQueueSummary(); // Update public view when queue changes
         }
 
-        // NEW: Renders the public summary of today's queue
+        // NEW: Renders the public summary of today's queue with pagination/carousel
         function renderPublicQueueSummary() {
             if (!publicQueueSummaryContainer || !publicQueueCount) return;
 
@@ -785,10 +889,17 @@
                 emptyRow.innerHTML = `<td colspan="4" class="px-6 py-4">Belum ada siswa dalam antrian izin hari ini.</td>`;
                 tableBody.appendChild(emptyRow);
             } else {
-                printQueue.forEach((student, index) => {
+                // Calculate start and end index for current page
+                const totalPages = Math.ceil(printQueue.length / publicItemsPerPage);
+                const startIndex = publicCurrentPage * publicItemsPerPage;
+                const endIndex = Math.min(startIndex + publicItemsPerPage, printQueue.length);
+                
+                const studentsToDisplay = printQueue.slice(startIndex, endIndex);
+
+                studentsToDisplay.forEach((student, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="px-6 py-4">${index + 1}</td>
+                        <td class="px-6 py-4">${startIndex + index + 1}</td>
                         <td class="px-6 py-4 font-semibold">${student.name}</td>
                         <td class="px-6 py-4">${student.class}</td>
                         <td class="px-6 py-4">${student.reason}</td>
@@ -936,6 +1047,71 @@
         }
 
         // --- CORE LOGIC ---
+        // NEW: Function to simulate initial student and queue data
+        function simulateInitialData() {
+            // Only simulate if the student database is empty to avoid overwriting user data
+            // Check localStorage directly for existing data
+            const existingStudents = localStorage.getItem('studentDatabase');
+            const existingQueue = localStorage.getItem('printQueue');
+
+            if (existingStudents && JSON.parse(existingStudents).length > 0 || 
+                existingQueue && JSON.parse(existingQueue).length > 0) {
+                console.log("Data already exists, skipping simulation.");
+                return;
+            }
+
+            console.log("Simulating initial data...");
+
+            const sampleNames = [
+                "Budi Santoso", "Siti Aminah", "Joko Susilo", "Dewi Lestari", "Agus Salim",
+                "Fitriani Hasan", "Rina Amelia", "Doni Saputra", "Eka Putri", "Fajar Ramadhan",
+                "Gita Permata", "Hadi Wijaya", "Indah Sari", "Kevin Pratama", "Lia Anggraini",
+                "Mira Yulianti", "Nanda Pratama", "Oscar Wijaya", "Putri Rahayu", "Qori Abdullah"
+            ];
+            const sampleClasses = ["10A", "10B", "11IPA1", "11IPS2", "12IPA3", "12IPS4"];
+            const sampleWalis = [
+                "Bapak Budi", "Ibu Aminah", "Pak Susilo", "Bu Lestari", "Pak Salim",
+                "Bu Hasan", "Ibu Rina", "Pak Doni", "Bu Eka", "Pak Fajar"
+            ];
+            const sampleReasons = ["Sakit", "Izin"];
+
+            // Generate 20 unique students for the database
+            for (let i = 0; i < 20; i++) {
+                const name = sampleNames[i % sampleNames.length] + (i < 10 ? '' : ` ${i + 1}`); // Add number for more uniqueness
+                const studentClass = sampleClasses[i % sampleClasses.length];
+                const wali = sampleWalis[i % sampleWalis.length];
+                const nomorHpWali = `0812345${1000 + i}`;
+                studentDatabase.push({ name, class: studentClass, wali, nomorHpWali });
+            }
+
+            // Select some students for the initial print queue
+            const queueStudentsCount = 15; // More than 10 to test pagination
+            const shuffledStudents = [...studentDatabase].sort(() => 0.5 - Math.random()); // Shuffle for variety
+
+            for (let i = 0; i < queueStudentsCount; i++) {
+                const student = shuffledStudents[i];
+                const reason = sampleReasons[i % sampleReasons.length];
+                const addedByEmployee = employees[i % employees.length]; // Cycle through admin, guru1, tu
+
+                printQueue.push({
+                    name: student.name,
+                    class: student.class,
+                    wali: student.wali,
+                    reason: reason,
+                    addedBy: addedByEmployee.name,
+                    addedByUsername: addedByEmployee.username
+                });
+            }
+
+            saveStudentDatabaseToLocalStorage();
+            savePrintQueueToLocalStorage();
+            updateDatabaseInfo();
+            renderQueue(); // Render main dashboard queue
+            renderPublicQueueSummary(); // Render public view queue
+            console.log("Simulation complete. 20 students added to database, " + queueStudentsCount + " to queue.");
+        }
+
+
         function generateSlipsPDF() {
             if (printQueue.length === 0) {
                 showMessage("Antrian Kosong", "Daftar antrian kosong. Tidak ada data untuk dicetak.");
@@ -1026,9 +1202,9 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-            const tableColumn = ["No", "Nama Siswa", "Kelas", "Orang Tua/Wali", "Keterangan"];
+            const tableColumn = ["No", "Nama Siswa", "Kelas", "Orang Tua/Wali", "Keterangan", "Ditambahkan Oleh"]; // Added new column
             const tableRows = printQueue.map((student, index) => [
-                index + 1, student.name, student.class, student.wali, student.reason
+                index + 1, student.name, student.class, student.wali, student.reason, student.addedBy || '-' // Display addedBy
             ]);
             
             const formattedDate = activeDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -1231,7 +1407,14 @@
                 showMessage('Duplikat Antrian', `Siswa bernama "${selectedStudent.name}" sudah ada di dalam antrian.`);
                 return;
             }
-            printQueue.push({ ...selectedStudent, reason: reasonSelect.value, wali: waliName });
+            // Add addedBy and addedByUsername to the student object when adding to queue
+            printQueue.push({ 
+                ...selectedStudent, 
+                reason: reasonSelect.value, 
+                wali: waliName,
+                addedBy: loggedInEmployee ? loggedInEmployee.name : 'Unknown', // Capture employee name
+                addedByUsername: loggedInEmployee ? loggedInEmployee.username : 'unknown' // Capture employee username for deletion logic
+            });
             savePrintQueueToLocalStorage(); // Save printQueue
             selectedStudent = null;
             if (searchForm) searchForm.reset();
@@ -1242,9 +1425,30 @@
         }
 
         function removeFromQueue(index) {
-            printQueue.splice(index, 1);
-            savePrintQueueToLocalStorage(); // Save printQueue
-            renderQueue();
+            // Get the student object to be removed
+            const studentToRemove = printQueue[index];
+
+            // Check if user is admin or the one who added the entry
+            if (loggedInEmployee && loggedInEmployee.role === 'admin') {
+                // Admin has full access, proceed
+                showConfirmation('Hapus Entri Antrian?', `Anda yakin ingin menghapus entri antrian untuk ${studentToRemove.name}?`, () => {
+                    printQueue.splice(index, 1);
+                    savePrintQueueToLocalStorage(); // Save printQueue
+                    renderQueue();
+                    showMessage('Entri Dihapus', `Entri antrian untuk ${studentToRemove.name} telah dihapus.`);
+                });
+            } else if (loggedInEmployee && studentToRemove.addedByUsername === loggedInEmployee.username) {
+                // User added this entry, allow deletion
+                showConfirmation('Hapus Entri Anda?', `Anda yakin ingin menghapus entri antrian yang Anda tambahkan untuk ${studentToRemove.name}?`, () => {
+                    printQueue.splice(index, 1);
+                    savePrintQueueToLocalStorage(); // Save printQueue
+                    renderQueue();
+                    showMessage('Entri Dihapus', `Entri antrian untuk ${studentToRemove.name} telah dihapus.`);
+                });
+            } else {
+                // Not authorized
+                showMessage('Tidak Diizinkan', 'Anda hanya dapat menghapus entri antrian yang Anda tambahkan sendiri, kecuali Anda adalah Admin.');
+            }
         }
 
         function resetQueue() {
@@ -1339,6 +1543,48 @@
             });
         }
 
+        // NEW: Handle Change Password
+        function handleChangePassword(event) {
+            event.preventDefault();
+            const currentPass = currentPasswordInput.value;
+            const newPass = newPasswordInput.value;
+            const confirmNewPass = confirmNewPasswordInput.value;
+
+            if (!currentPass || !newPass || !confirmNewPass) {
+                showMessage('Input Kosong', 'Semua kolom password harus diisi.');
+                return;
+            }
+
+            if (newPass !== confirmNewPass) {
+                showMessage('Password Tidak Cocok', 'Password baru dan konfirmasi password tidak cocok.');
+                return;
+            }
+
+            if (newPass === currentPass) {
+                showMessage('Password Sama', 'Password baru tidak boleh sama dengan password saat ini.');
+                return;
+            }
+
+            if (loggedInEmployee && loggedInEmployee.password === currentPass) {
+                // Find the employee in the main employees array and update their password
+                const employeeIndex = employees.findIndex(emp => emp.username === loggedInEmployee.username);
+                if (employeeIndex !== -1) {
+                    employees[employeeIndex].password = newPass;
+                    loggedInEmployee.password = newPass; // Update current session's employee object
+                    saveEmployeesToLocalStorage();
+                    showMessage('Berhasil', 'Password berhasil diganti!');
+                    changePasswordModal.classList.add('hidden');
+                    changePasswordForm.reset();
+                } else {
+                    // This case should ideally not happen if loggedInEmployee is set correctly
+                    showMessage('Error', 'Gagal menemukan data pengguna. Silakan coba login ulang.');
+                    console.error('Logged-in employee not found in array during password change.');
+                }
+            } else {
+                showMessage('Password Salah', 'Password saat ini salah.');
+            }
+        }
+
 
         function updateDatabaseInfo() {
             if (databaseInfo) databaseInfo.textContent = `${studentDatabase.length} siswa di database.`;
@@ -1409,7 +1655,8 @@
         if (queueContainer) queueContainer.addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('remove-queue-btn')) {
                 const index = parseInt(e.target.dataset.index, 10);
-                if (!isNaN(index)) removeFromQueue(index);
+                // Pass the username of the entry adder for permission check
+                removeFromQueue(index);
             }
         });
         
@@ -1517,6 +1764,23 @@ themeSettingRadios.forEach(radio => {
                 }
             }
         });
+
+        // NEW: Change Password Event Listeners
+        if (openChangePasswordModalBtn) openChangePasswordModalBtn.addEventListener('click', () => {
+            changePasswordModal.classList.remove('hidden');
+            currentPasswordInput.focus(); // Focus on current password input
+        });
+        if (closeChangePasswordModalBtn) closeChangePasswordModalBtn.addEventListener('click', () => {
+            changePasswordModal.classList.add('hidden');
+            changePasswordForm.reset(); // Clear form
+        });
+        if (changePasswordModal) changePasswordModal.addEventListener('click', (e) => {
+            if (e.target === changePasswordModal) {
+                changePasswordModal.classList.add('hidden');
+                changePasswordForm.reset();
+            }
+        });
+        if (changePasswordForm) changePasswordForm.addEventListener('submit', handleChangePassword);
 
 
         setInitialUIState(); // Initial UI setup
