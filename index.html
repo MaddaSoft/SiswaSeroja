@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Antrian Surat Izin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Expose to global scope for use in the main script
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.initialAuthToken = initialAuthToken;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signInAnonymously = signInAnonymously; 
+        window.signOut = signOut;
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
@@ -62,58 +87,209 @@
         .dark #queue-container tbody tr:hover { background-color: #334155; }
         .dark .text-slate-800 { color: #f1f5f9; }
         .dark .text-slate-900 { color: #f8fafc; }
-        .dark #manual-add-modal > div, .dark #confirm-modal > div, .dark #settings-modal > div { background-color: #1e293b; }
+        .dark #manual-add-modal > div, .dark #confirm-modal > div, .dark #settings-modal > div, .dark #login-form-modal > div, .dark #employee-management-modal > div { background-color: #1e293b; }
+
+        /* Public View Specific Styles */
+        #public-view {
+            background-image: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+            background-size: cover;
+            animation: backgroundPan 15s ease infinite alternate;
+            overflow-y: auto; /* Enable scrolling for public view */
+        }
+        @keyframes backgroundPan {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        .public-content {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 90%;
+            padding: 2.5rem;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+            margin: 2rem auto; /* Center and add vertical margin */
+        }
+        .dark .public-content {
+            background-color: rgba(30, 41, 59, 0.9);
+            color: #cbd5e1;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .public-header {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #38bdf8, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .public-description {
+            font-size: 1.125rem;
+            color: #475569;
+            margin-bottom: 2rem;
+        }
+        .dark .public-description {
+            color: #94a3b8;
+        }
+        .public-info-section {
+            text-align: left;
+            margin-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 2rem;
+            color: #334155;
+        }
+        .dark .public-info-section {
+            border-color: #334155;
+            color: #94a3b8;
+        }
+        .public-info-section h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        .dark .public-info-section h3 {
+            color: #f1f5f9;
+        }
+        .public-info-section p {
+            margin-bottom: 0.75rem;
+        }
+        .public-queue-table-container {
+            max-height: 300px; /* Limit height for scrollability */
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        .dark .public-queue-table-container {
+            border-color: #334155;
+        }
+        .public-queue-table th, .public-queue-table td {
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dark .public-queue-table th, .dark .public-queue-table td {
+            border-color: #334155;
+        }
+        .public-queue-table thead {
+            background-color: #f1f5f9;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .dark .public-queue-table thead {
+            background-color: #334155;
+            color: #cbd5e1;
+        }
+        .public-queue-table tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        .dark .public-queue-table tbody tr:nth-child(even) {
+            background-color: #1e293b;
+        }
+        .public-queue-table tbody tr:hover {
+            background-color: #e2e8f0;
+        }
+        .dark .public-queue-table tbody tr:hover {
+            background-color: #475569;
+        }
+        .public-queue-empty-message-row td {
+            padding: 1rem;
+            text-align: center;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800">
 
-    <div class="flex min-h-screen">
-        <aside class="w-96 bg-white p-6 border-r border-slate-200 flex flex-col flex-shrink-0 h-screen">
+    <!-- Public View (Halaman Informasi Publik) -->
+    <div id="public-view" class="fixed inset-0 flex items-center justify-center flex-col p-4 z-50">
+        <div class="public-content">
+            <header class="mb-8">
+                <!-- Removed: <h1 class="public-header">Selamat Datang di Aplikasi Izin Siswa</h1> -->
+                <!-- Removed: <p class="public-description">Sistem terpadu untuk pengelolaan izin siswa yang efisien dan transparan.</p> -->
+            </header>
+            
+            <section class="public-info-section mt-6">
+                <h3>SISWA IZIN HARI INI : <span id="public-queue-count">0</span> SISWA</h3>
+                <div id="public-queue-summary-container" class="public-queue-table-container">
+                    <!-- Public queue summary will be rendered here -->
+                </div>
+            </section>
+
+            <button id="login-button" class="mt-8 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">
+                Masuk ke Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Application Dashboard (Hidden by default) -->
+    <div id="app-dashboard" class="flex min-h-screen hidden">
+        <aside class="w-96 bg-white p-6 border-r border-slate-200 flex flex-col flex-shrink-0 h-screen dark:bg-slate-800 dark:border-slate-700">
             <p class="text-xs font-extrabold tracking-widest uppercase animated-brand mb-4">Madda Soft Production</p>
             <h1 class="text-2xl font-bold mb-1">Aplikasi Izin Siswa</h1>
             <p id="active-date-display" class="text-sm text-slate-500 mb-6">Selasa, 8 Juli 2025</p>
             
             <nav class="space-y-2">
-                <button id="menu-database" class="menu-item w-full flex items-center justify-between p-3 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors">
+                <!-- Database Siswa menu item, hidden by default -->
+                <button id="menu-database" class="menu-item w-full flex items-center justify-between p-3 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors hidden dark:text-slate-300 dark:hover:bg-slate-700">
                     <span class="font-semibold">Database Siswa</span>
                     <svg class="arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </button>
+                <!-- Database Siswa submenu, hidden by default -->
                 <ul id="submenu-database" class="submenu space-y-1 mt-1 pl-4">
-                    <li><button id="open-manual-add-modal" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>Tambah Siswa Baru</span></button></li>
+                    <li><button id="open-manual-add-modal" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2 dark:text-slate-400 dark:hover:bg-slate-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>Tambah Siswa Baru</span></button></li>
                     <li>
-                        <label for="csv-file-input" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm block cursor-pointer flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg><span>Impor dari .XLSX</span></label>
+                        <label for="csv-file-input" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm block cursor-pointer flex items-center space-x-2 dark:text-slate-400 dark:hover:bg-slate-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg><span>Impor dari .XLSX</span></label>
                         <input type="file" id="csv-file-input" accept=".xlsx">
                     </li>
-                    <li><button id="download-template-button" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span>Unduh Template XLSX</span></button></li>
-                    <li><button id="delete-database-button" class="w-full text-left p-2 rounded-md text-red-600 hover:bg-red-50 text-sm flex items-center space-x-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg><span>Hapus Database</span></button></li>
+                    <li><button id="download-template-button" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2 dark:text-slate-400 dark:hover:bg-slate-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span>Unduh Template XLSX</span></button></li>
+                    <li><button id="delete-database-button" class="w-full text-left p-2 rounded-md text-red-600 hover:bg-red-50 text-sm flex items-center space-x-2 dark:text-red-400 dark:hover:bg-red-900/20"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg><span>Hapus Database</span></button></li>
                 </ul>
 
+                <!-- Employee Management Menu Item -->
+                <button id="menu-employee-management" class="menu-item w-full flex items-center justify-between p-3 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors hidden dark:text-slate-300 dark:hover:bg-slate-700">
+                    <span class="font-semibold">Manajemen Pegawai</span>
+                    <svg class="arrow w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+                <ul id="submenu-employee-management" class="submenu space-y-1 mt-1 pl-4">
+                    <li><button id="open-employee-management-modal" class="w-full text-left p-2 rounded-md text-slate-600 hover:bg-slate-100 text-sm flex items-center space-x-2 dark:text-slate-400 dark:hover:bg-slate-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg><span>Kelola Pegawai</span></button></li>
+                </ul>
+
+
                 <div class="pt-4">
-                    <h2 class="font-semibold text-slate-700 p-3">Cari & Tambah Antrian</h2>
-                    <form id="search-form" class="space-y-3 relative p-3">
+                    <h2 class="font-semibold text-slate-700 p-3 dark:text-slate-300">Cari & Tambah Antrian</h2>
+                    <form id="search-form" class="space-y-3 relative p-3 bg-white rounded-lg shadow-sm dark:bg-slate-800 dark:border-slate-700">
                         <div>
-                            <label for="search-nama" class="block text-xs font-medium text-slate-600">Nama Siswa</label>
-                            <input type="text" id="search-nama" name="nama" autocomplete="off" placeholder="Ketik nama..." class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 disabled:bg-slate-50">
-                            <div id="autocomplete-results" class="absolute z-10 w-full bg-white border border-slate-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg hidden"></div>
+                            <label for="search-nama" class="block text-xs font-medium text-slate-600 dark:text-slate-400">Nama Siswa</label>
+                            <input type="text" id="search-nama" name="nama" autocomplete="off" placeholder="Ketik nama..." class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 disabled:bg-slate-50 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 dark:disabled:bg-slate-700/50">
+                            <div id="autocomplete-results" class="absolute z-10 w-full bg-white border border-slate-200 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg hidden dark:bg-slate-700 dark:border-slate-600"></div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="kelas" class="block text-xs font-medium text-slate-600">Kelas</label>
-                                <input type="text" id="kelas" name="kelas" readonly class="mt-1 block w-full px-3 py-2 bg-slate-100 border-slate-300 rounded-md text-sm">
+                                <label for="kelas" class="block text-xs font-medium text-slate-600 dark:text-slate-400">Kelas</label>
+                                <input type="text" id="kelas" name="kelas" readonly class="mt-1 block w-full px-3 py-2 bg-slate-100 border-slate-300 rounded-md text-sm dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300">
                             </div>
                              <div>
-                                <label for="wali" class="block text-xs font-medium text-slate-600">Nama Orang Tua / Wali</label>
-                                <input type="text" id="wali" name="wali" required placeholder="Nama Wali" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500">
+                                <label for="wali" class="block text-xs font-medium text-slate-600 dark:text-slate-400">Nama Orang Tua / Wali</label>
+                                <input type="text" id="wali" name="wali" required placeholder="Nama Wali" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                             </div>
                         </div>
                         <div>
-                            <label for="keterangan" class="block text-xs font-medium text-slate-600">Keterangan</label>
+                            <label for="keterangan" class="block text-xs font-medium text-slate-600 dark:text-slate-400">Keterangan</label>
                             <div class="flex items-center space-x-2 mt-1">
-                                <select id="keterangan" name="keterangan" class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500">
+                                <select id="keterangan" name="keterangan" class="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                                     <option>Sakit</option>
                                     <option>Izin</option>
                                 </select>
-                                <button type="submit" id="add-button" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 disabled:bg-indigo-300 whitespace-nowrap">
+                                <button type="submit" id="add-button" class="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 disabled:bg-indigo-300 whitespace-nowrap dark:disabled:bg-indigo-900/50">
                                     + Tambah
                                 </button>
                             </div>
@@ -122,26 +298,30 @@
                 </div>
             </nav>
             
-            <div class="mt-auto flex justify-between items-center text-xs text-slate-400 pt-4 border-t">
+            <div class="mt-auto flex justify-between items-center text-xs text-slate-400 pt-4 border-t dark:border-slate-700">
                 <span id="database-info">Database kosong.</span>
+                <span id="user-id-display" class="text-xs text-slate-400"></span>
                 <button id="open-settings-modal" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
+                <button id="logout-button" class="px-3 py-1 bg-red-500 text-white text-xs rounded-md hover:bg-red-600 transition-colors ml-2">Keluar</button>
             </div>
         </aside>
 
-        <main class="flex-grow bg-slate-50 p-8 flex flex-col h-screen">
+        <main class="flex-grow bg-slate-50 p-8 flex flex-col h-screen dark:bg-slate-900">
              <div class="flex justify-between items-center mb-4">
-                <h2 id="queue-title" class="text-xl font-semibold">Daftar Antrian</h2>
+                <h2 id="queue-title" class="text-xl font-semibold dark:text-slate-100">Daftar Antrian</h2>
                 <div class="flex items-center space-x-4">
-                    <button id="reset-queue-button" class="text-sm text-orange-600 hover:text-orange-800 font-semibold">Hapus Data Hari Ini</button>
-                    <button id="print-pdf-button" class="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 text-sm">Cetak Laporan</button>
+                    <!-- Reset Queue Button, hidden by default -->
+                    <button id="reset-queue-button" class="text-sm text-orange-600 hover:text-orange-800 font-semibold hidden dark:text-orange-400 dark:hover:text-orange-500">Hapus Data Hari Ini</button>
+                    <!-- Print PDF Button, hidden by default -->
+                    <button id="print-pdf-button" class="bg-blue-600 text-white font-bold py-2 px-5 rounded-md hover:bg-blue-700 text-sm hidden">Cetak Laporan</button>
                     <button id="print-slips-button" class="bg-emerald-600 text-white font-bold py-2 px-5 rounded-md hover:bg-emerald-700 text-sm">Cetak Izin Siswa</button>
                 </div>
             </div>
-            <div id="queue-container" class="flex-grow overflow-y-auto bg-white rounded-lg border border-slate-200 shadow-sm">
+            <div id="queue-container" class="flex-grow overflow-y-auto bg-white rounded-lg border border-slate-200 shadow-sm dark:bg-slate-800 dark:border-slate-700">
                 </div>
-            <footer class="text-center text-xs text-slate-400 pt-4">
+            <footer class="text-center text-xs text-slate-400 pt-4 dark:text-slate-500">
                 Design & Creative 2025 By : Madda soft Feat Gemini
             </footer>
         </main>
@@ -149,20 +329,20 @@
 
     <!-- Manual Add Student Modal -->
     <div id="manual-add-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md dark:bg-slate-800">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">Tambah Siswa Baru ke Database</h2>
-                <button id="close-manual-add-modal-button" class="text-slate-500 hover:text-slate-800">&times;</button>
+                <h2 class="text-xl font-bold dark:text-slate-100">Tambah Siswa Baru ke Database</h2>
+                <button id="close-manual-add-modal-button" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">&times;</button>
             </div>
             <form id="manual-add-form" class="space-y-4">
-                    <p class="text-sm text-slate-600">Siswa yang ditambahkan di sini akan langsung bisa dicari.</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Siswa yang ditambahkan di sini akan langsung bisa dicari.</p>
                     <div>
-                        <label for="manual-nama" class="block text-sm font-medium text-slate-700">Nama Siswa Baru</label>
-                        <input type="text" id="manual-nama" placeholder="Nama Lengkap" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
+                        <label for="manual-nama" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nama Siswa Baru</label>
+                        <input type="text" id="manual-nama" placeholder="Nama Lengkap" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                     </div>
                     <div>
-                        <label for="manual-kelas" class="block text-sm font-medium text-slate-700">Kelas</label>
-                        <input type="text" id="manual-kelas" placeholder="Contoh: 9A" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
+                        <label for="manual-kelas" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Kelas</label>
+                        <input type="text" id="manual-kelas" placeholder="Contoh: 9A" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                     </div>
                     <button type="submit" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700">Tambah ke Database</button>
             </form>
@@ -171,11 +351,11 @@
 
     <!-- Confirmation / Message Modal (Reused) -->
     <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
-            <h3 id="confirm-title" class="text-lg font-bold mb-4">Konfirmasi Aksi</h3>
-            <p id="confirm-message" class="text-sm text-slate-600 mb-6">Apakah Anda yakin?</p>
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm dark:bg-slate-800">
+            <h3 id="confirm-title" class="text-lg font-bold dark:text-slate-100">Konfirmasi Aksi</h3>
+            <p id="confirm-message" class="text-sm text-slate-600 mb-6 dark:text-slate-400">Apakah Anda yakin?</p>
             <div class="flex justify-end space-x-3">
-                <button id="confirm-cancel-btn" class="px-4 py-2 rounded-md text-sm font-medium bg-slate-100 hover:bg-slate-200">Batal</button>
+                <button id="confirm-cancel-btn" class="px-4 py-2 rounded-md text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-300">Batal</button>
                 <button id="confirm-ok-btn" class="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">Ya, Lanjutkan</button>
             </div>
         </div>
@@ -183,34 +363,34 @@
     
     <!-- Settings Modal -->
     <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md dark:bg-slate-800">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold">Pengaturan</h2>
-                <button id="close-settings-modal-button" class="text-slate-500 hover:text-slate-800">&times;</button>
+                <h2 class="text-xl font-bold dark:text-slate-100">Pengaturan</h2>
+                <button id="close-settings-modal-button" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">&times;</button>
             </div>
             <div class="space-y-6">
                 <div>
-                    <h3 class="font-semibold mb-2">Pengaturan Tanggal Laporan</h3>
+                    <h3 class="font-semibold mb-2 dark:text-slate-200">Pengaturan Tanggal Laporan</h3>
                     <div class="flex items-center space-x-4">
-                        <label class="flex items-center space-x-2">
+                        <label class="flex items-center space-x-2 dark:text-slate-300">
                             <input type="radio" name="date-setting" value="auto" checked>
                             <span>Otomatis (Hari Ini)</span>
                         </label>
-                        <label class="flex items-center space-x-2">
+                        <label class="flex items-center space-x-2 dark:text-slate-300">
                             <input type="radio" name="date-setting" value="manual">
                             <span>Manual</span>
                         </label>
                     </div>
-                    <input type="date" id="manual-date-input" class="mt-2 w-full p-2 border rounded-md hidden">
+                    <input type="date" id="manual-date-input" class="mt-2 w-full p-2 border rounded-md hidden dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
                 </div>
                 <div>
-                    <h3 class="font-semibold mb-2">Tema Tampilan</h3>
+                    <h3 class="font-semibold mb-2 dark:text-slate-200">Tema Tampilan</h3>
                      <div class="flex items-center space-x-4">
-                        <label class="flex items-center space-x-2">
+                        <label class="flex items-center space-x-2 dark:text-slate-300">
                             <input type="radio" name="theme-setting" value="light" checked>
                             <span>Cerah</span>
                         </label>
-                        <label class="flex items-center space-x-2">
+                        <label class="flex items-center space-x-2 dark:text-slate-300">
                             <input type="radio" name="theme-setting" value="dark">
                             <span>Gelap</span>
                         </label>
@@ -220,26 +400,132 @@
         </div>
     </div>
 
+    <!-- Login Form Modal -->
+    <div id="login-form-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm dark:bg-slate-800">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold dark:text-slate-100">Masuk ke Dashboard</h2>
+                <button id="close-login-modal-button" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">&times;</button>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-username" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Username / NIP</label>
+                    <input type="text" id="login-username" placeholder="Masukkan Username atau NIP" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                    <input type="password" id="login-password" placeholder="Password Anda" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm focus:outline-none focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700">Masuk</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Employee Management Modal -->
+    <div id="employee-management-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-3xl dark:bg-slate-800">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold dark:text-slate-100">Manajemen Pegawai</h2>
+                <button id="close-employee-management-modal-button" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">&times;</button>
+            </div>
+            
+            <!-- Add New Employee Form -->
+            <h3 class="text-lg font-semibold mb-3 dark:text-slate-200">Tambah Pegawai Baru</h3>
+            <form id="add-employee-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 p-4 border border-slate-200 rounded-lg dark:border-slate-700">
+                <div>
+                    <label for="new-employee-username" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Username</label>
+                    <input type="text" id="new-employee-username" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <div>
+                    <label for="new-employee-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                    <input type="password" id="new-employee-password" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <div>
+                    <label for="new-employee-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nama Lengkap</label>
+                    <input type="text" id="new-employee-name" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                </div>
+                <div>
+                    <label for="new-employee-role" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Peran</label>
+                    <select id="new-employee-role" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100">
+                        <option value="staff">Staf (Guru/TU)</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="col-span-full text-right">
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700">Tambah Pegawai</button>
+                </div>
+            </form>
+
+            <!-- Employee List Table -->
+            <h3 class="text-lg font-semibold mb-3 dark:text-slate-200">Daftar Pegawai</h3>
+            <div class="overflow-x-auto border border-slate-200 rounded-lg shadow-sm dark:border-slate-700">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-100 dark:bg-slate-700 dark:text-slate-300">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Username</th>
+                            <th scope="col" class="px-6 py-3">Nama Lengkap</th>
+                            <th scope="col" class="px-6 py-3">Peran</th>
+                            <th scope="col" class="px-6 py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employee-table-body">
+                        <!-- Employee rows will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+                <div id="no-employees-message" class="p-4 text-center text-slate-400 hidden">Tidak ada pegawai di database.</div>
+            </div>
+        </div>
+    </div>
+
     <script>
+    // Ensure Firebase modules are loaded before initializing the app logic
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wait for Firebase global variables to be available
+        const checkFirebaseReady = setInterval(() => {
+            if (window.firebaseAuth && window.firebaseDb && window.signInAnonymously) {
+                clearInterval(checkFirebaseReady);
+                initializeApp();
+            }
+        }, 100); // Check every 100ms
+    });
+
     function initializeApp() {
+        // --- FIREBASE INITIALIZATION ---
+        const auth = window.firebaseAuth;
+        const db = window.firebaseDb;
+        const onAuthStateChanged = window.onAuthStateChanged;
+        const signInAnonymously = window.signInAnonymously; // Used for internal Firebase auth state
+        const signOut = window.signOut;
+
+        let userId = null; // To store the current user's ID (Firebase anonymous UID)
+        let loggedInEmployee = null; // To store the details of the logged-in employee
+
+        // --- EMPLOYEE DATABASE (FOR DEMONSTRATION ONLY) ---
+        // For a production application, this data should be stored securely in a database
+        // like Firestore, and authentication should be handled by a backend service.
+        // Initial hardcoded employees for first run if localStorage is empty
+        let employees = [
+            { username: 'admin', password: 'password123', name: 'Admin Utama', role: 'admin' },
+            { username: 'guru1', password: 'passguru', name: 'Bapak Budi', role: 'staff' },
+            { username: 'tu', password: 'passtu', name: 'Ibu Siti', role: 'staff' }
+        ];
+
         // --- STATE MANAGEMENT ---
-        // Array to store all student data loaded from local storage or added manually.
         let studentDatabase = [];
-        // Array to store students currently in the daily permission queue.
-        let printQueue = [];
-        // Stores the student object selected from the autocomplete search.
+        let printQueue = []; // This will now persist for public view
         let selectedStudent = null;
-        // Callback function for the confirmation modal.
         let onConfirmCallback = null;
-        // The date currently active for reports and queue display.
         let activeDate = new Date();
-        // Mode for date selection: 'auto' (today) or 'manual'.
         let dateMode = 'auto';
-        // Current theme: 'light' or 'dark'. Loaded from local storage.
         let currentTheme = localStorage.getItem('appTheme') || 'light';
 
         // --- DOM ELEMENTS ---
-        // Caching references to frequently used DOM elements for performance.
+        const publicView = document.getElementById('public-view');
+        const appDashboard = document.getElementById('app-dashboard');
+        const loginButton = document.getElementById('login-button');
+        const logoutButton = document.getElementById('logout-button');
+        const userIdDisplay = document.getElementById('user-id-display'); // Now displays employee name/username
+
         const appTitle = document.querySelector('h1');
         const appVersion = document.querySelector('p.text-sm.text-slate-500');
         const activeDateDisplay = document.getElementById('active-date-display');
@@ -279,34 +565,161 @@
         const dateSettingRadios = document.querySelectorAll('input[name="date-setting"]');
         const manualDateInput = document.getElementById('manual-date-input');
         const themeSettingRadios = document.querySelectorAll('input[name="theme-setting"]');
+
+        // Login Form Modal Elements
+        const loginFormModal = document.getElementById('login-form-modal');
+        const closeLoginFormModalBtn = document.getElementById('close-login-modal-button');
+        const loginForm = document.getElementById('login-form');
+        const loginUsernameInput = document.getElementById('login-username');
+        const loginPasswordInput = document.getElementById('login-password');
+
+        // Employee Management Modal Elements
+        const menuEmployeeManagement = document.getElementById('menu-employee-management');
+        const submenuEmployeeManagement = document.getElementById('submenu-employee-management');
+        const openEmployeeManagementModalBtn = document.getElementById('open-employee-management-modal');
+        const employeeManagementModal = document.getElementById('employee-management-modal');
+        const closeEmployeeManagementModalBtn = document.getElementById('close-employee-management-modal-button');
+        const addEmployeeForm = document.getElementById('add-employee-form');
+        const newEmployeeUsernameInput = document.getElementById('new-employee-username');
+        const newEmployeePasswordInput = document = document.getElementById('new-employee-password');
+        const newEmployeeNameInput = document.getElementById('new-employee-name');
+        const newEmployeeRoleSelect = document.getElementById('new-employee-role');
+        const employeeTableBody = document.getElementById('employee-table-body');
+        const noEmployeesMessage = document.getElementById('no-employees-message');
+
+        // Public View Specific Elements
+        const publicQueueCount = document.getElementById('public-queue-count');
+        const publicQueueSummaryContainer = document.getElementById('public-queue-summary-container');
         
+        // --- AUTHENTICATION LOGIC ---
+        onAuthStateChanged(auth, (user) => {
+            if (user && loggedInEmployee) { // Check if Firebase is authenticated AND an employee is logged in
+                userId = user.uid; // Firebase anonymous UID
+                publicView.classList.add('hidden');
+                appDashboard.classList.remove('hidden');
+                if (userIdDisplay) userIdDisplay.textContent = `Login sebagai: ${loggedInEmployee.name}`;
+                
+                // Load student database (private to logged-in users)
+                loadStudentDatabaseFromLocalStorage(); 
+
+                // Show/hide employee management menu based on role
+                if (loggedInEmployee.role === 'admin') {
+                    menuEmployeeManagement.classList.remove('hidden');
+                    menuDatabase.classList.remove('hidden'); // Show Database menu for admin
+                    resetQueueButton.classList.remove('hidden'); // Show Reset Queue button for admin
+                    printPdfButton.classList.remove('hidden'); // Show Print PDF button for admin
+                } else {
+                    menuEmployeeManagement.classList.add('hidden');
+                    submenuEmployeeManagement.classList.remove('open'); // Close submenu if not admin
+                    menuDatabase.classList.add('hidden'); // Hide Database menu for non-admin
+                    submenuDatabase.classList.remove('open'); // Close submenu if not admin
+                    resetQueueButton.classList.add('hidden'); // Hide Reset Queue button for non-admin
+                    printPdfButton.classList.add('hidden'); // Hide Print PDF button for non-admin
+                }
+
+            } else {
+                userId = null;
+                loggedInEmployee = null; // Clear logged-in employee state
+                publicView.classList.remove('hidden');
+                appDashboard.classList.add('hidden');
+                if (userIdDisplay) userIdDisplay.textContent = '';
+                // Clear student database from memory on logout (printQueue persists)
+                studentDatabase = []; 
+                saveStudentDatabaseToLocalStorage(); // Save empty student database
+                updateDatabaseInfo();
+                
+                // Re-render public queue summary when logged out
+                renderPublicQueueSummary(); 
+
+                menuEmployeeManagement.classList.add('hidden'); // Always hide for logged out users
+                submenuEmployeeManagement.classList.remove('open');
+                menuDatabase.classList.add('hidden'); // Always hide for logged out users
+                submenuDatabase.classList.remove('open');
+                resetQueueButton.classList.add('hidden'); // Always hide for logged out users
+                printPdfButton.classList.add('hidden'); // Always hide for logged out users
+            }
+        });
+
+        // Function to handle login with username and password (custom authentication)
+        async function handleEmployeeLogin(event) {
+            event.preventDefault(); // Prevent default form submission
+            const username = loginUsernameInput.value.trim();
+            const password = loginPasswordInput.value.trim();
+
+            if (!username || !password) {
+                showMessage('Login Gagal', 'Username/NIP dan password tidak boleh kosong.');
+                return;
+            }
+
+            // Find employee in the hardcoded list
+            const foundEmployee = employees.find(emp => 
+                emp.username.toLowerCase() === username.toLowerCase() && emp.password === password
+            );
+
+            if (foundEmployee) {
+                loggedInEmployee = foundEmployee; // Store logged-in employee details
+                try {
+                    // Sign in anonymously to get a Firebase UID for session management
+                    await signInAnonymously(auth); 
+                    loginFormModal.classList.add('hidden'); // Hide login modal on success
+                    loginForm.reset(); // Clear form fields after successful login
+                    // onAuthStateChanged listener will handle UI update based on Firebase auth and loggedInEmployee state
+                } catch (error) {
+                    console.error("Firebase anonymous sign-in failed:", error);
+                    showMessage('Login Gagal', `Terjadi kesalahan saat memulai sesi: ${error.message}`);
+                    loggedInEmployee = null; // Reset if Firebase auth fails
+                }
+            } else {
+                showMessage('Login Gagal', 'Username/NIP atau password salah. Silakan coba lagi.');
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await signOut(auth); // Sign out from Firebase
+                // loggedInEmployee is cleared by onAuthStateChanged listener
+                showMessage('Berhasil Keluar', 'Anda telah berhasil keluar dari aplikasi.');
+                // onAuthStateChanged listener will handle UI update
+            } catch (error) {
+                console.error("Logout failed:", error);
+                showMessage('Logout Gagal', `Terjadi kesalahan saat keluar: ${error.message}`);
+            }
+        }
+
         // --- INITIAL UI STATE ---
-        // Sets the initial display state of UI elements and loads data.
         function setInitialUIState() {
             if (appTitle) appTitle.textContent = "Aplikasi Izin Siswa";
             if (appVersion) appVersion.textContent = "Versi 2.1 (XLSX Support)";
-            if (searchInput) searchInput.disabled = true; // Disable search until database is loaded/populated.
-            if (addButton) addButton.disabled = true; // Disable add button initially.
+            if (searchInput) searchInput.disabled = true;
+            if (addButton) addButton.disabled = true;
             
-            applyTheme(currentTheme); // Apply the saved or default theme.
-            updateDateDisplay(); // Display the current active date.
-            loadDataFromLocalStorage(); // Load student and queue data from local storage.
+            applyTheme(currentTheme);
+            updateDateDisplay();
+            loadEmployeesFromLocalStorage(); // Load employees at startup
+            loadPrintQueueFromLocalStorage(); // Load printQueue for public view at startup
+
+            // Ensure these are hidden on initial load before auth state is determined
+            menuDatabase.classList.add('hidden');
+            submenuDatabase.classList.remove('open'); // Ensure submenu is closed
+            menuEmployeeManagement.classList.add('hidden');
+            submenuEmployeeManagement.classList.remove('open'); // Ensure submenu is closed
+            resetQueueButton.classList.add('hidden');
+            printPdfButton.classList.add('hidden');
+
+            renderPublicQueueSummary(); // Render public queue on initial load
         }
 
         // --- RENDER FUNCTIONS ---
-        // Renders the current state of the permission queue into the table.
         function renderQueue() {
             if (!queueContainer || !queueTitle) return;
-            queueContainer.innerHTML = ''; // Clear existing table content.
-            queueTitle.textContent = `Daftar Antrian (${printQueue.length} Siswa)`; // Update queue title.
+            queueContainer.innerHTML = '';
+            queueTitle.textContent = `Daftar Antrian (${printQueue.length} Siswa)`;
 
             if (printQueue.length === 0) {
-                // Display a message if the queue is empty.
                 queueContainer.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-base text-slate-400">Antrian kosong.</p></div>`;
                 return;
             }
             
-            // Create the table structure.
             const table = document.createElement('table');
             table.className = 'w-full text-sm text-left text-slate-500';
             table.innerHTML = `
@@ -324,7 +737,6 @@
             `;
             
             const tableBody = table.querySelector('#queue-table-body');
-            // Populate the table with students from the printQueue.
             printQueue.forEach((student, index) => {
                 const row = document.createElement('tr');
                 row.className = 'bg-white border-b hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700';
@@ -342,14 +754,80 @@
             });
             
             queueContainer.appendChild(table);
+            renderPublicQueueSummary(); // Update public view when queue changes
+        }
+
+        // NEW: Renders the public summary of today's queue
+        function renderPublicQueueSummary() {
+            if (!publicQueueSummaryContainer || !publicQueueCount) return;
+
+            publicQueueCount.textContent = printQueue.length;
+            publicQueueSummaryContainer.innerHTML = ''; // Clear existing content
+
+            const table = document.createElement('table');
+            table.className = 'w-full text-sm text-left text-slate-500 public-queue-table';
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th scope="col" class="px-6 py-3">No</th>
+                        <th scope="col" class="px-6 py-3">Nama Siswa</th>
+                        <th scope="col" class="px-6 py-3">Kelas</th>
+                        <th scope="col" class="px-6 py-3">Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `;
+            const tableBody = table.querySelector('tbody');
+
+            if (printQueue.length === 0) {
+                const emptyRow = document.createElement('tr');
+                emptyRow.className = 'public-queue-empty-message-row';
+                emptyRow.innerHTML = `<td colspan="4" class="px-6 py-4">Belum ada siswa dalam antrian izin hari ini.</td>`;
+                tableBody.appendChild(emptyRow);
+            } else {
+                printQueue.forEach((student, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4">${index + 1}</td>
+                        <td class="px-6 py-4 font-semibold">${student.name}</td>
+                        <td class="px-6 py-4">${student.class}</td>
+                        <td class="px-6 py-4">${student.reason}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            publicQueueSummaryContainer.appendChild(table);
+        }
+
+        // Renders the employee list table in the employee management modal
+        function renderEmployeesTable() {
+            if (!employeeTableBody || !noEmployeesMessage) return;
+
+            employeeTableBody.innerHTML = ''; // Clear existing rows
+
+            if (employees.length === 0) {
+                noEmployeesMessage.classList.remove('hidden');
+                return;
+            } else {
+                noEmployeesMessage.classList.add('hidden');
+            }
+
+            employees.forEach((emp, index) => {
+                const row = document.createElement('tr');
+                row.className = 'bg-white border-b hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700';
+                row.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">${emp.username}</td>
+                    <td class="px-6 py-4">${emp.name}</td>
+                    <td class="px-6 py-4">${emp.role === 'admin' ? 'Admin' : 'Staf'}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button data-username="${emp.username}" class="delete-employee-btn text-red-500 hover:text-red-700 font-semibold">Hapus</button>
+                    </td>
+                `;
+                employeeTableBody.appendChild(row);
+            });
         }
         
         // --- MODAL & NOTIFICATION LOGIC ---
-        // Displays a custom modal for confirmations or simple messages.
-        // type: 'confirm' (shows Yes/No buttons) or 'message' (shows only OK button).
-        // title: The title of the modal.
-        // message: The main content message.
-        // onConfirm: Callback function executed if 'Ya, Lanjutkan' (for confirm) or 'OK' (for message) is clicked.
         function showCustomModal(type, title, message, onConfirm = null) {
             if (!confirmModal || !confirmTitle || !confirmMessage || !confirmOkBtn || !confirmCancelBtn) return;
 
@@ -360,23 +838,21 @@
             if (type === 'message') {
                 confirmOkBtn.textContent = 'OK';
                 confirmOkBtn.className = 'px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700';
-                confirmCancelBtn.classList.add('hidden'); // Hide cancel button for messages
-            } else { // type === 'confirm'
+                confirmCancelBtn.classList.add('hidden');
+            } else {
                 confirmOkBtn.textContent = 'Ya, Lanjutkan';
                 confirmOkBtn.className = 'px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700';
-                confirmCancelBtn.classList.remove('hidden'); // Show cancel button for confirmations
+                confirmCancelBtn.classList.remove('hidden');
             }
 
             confirmModal.classList.remove('hidden');
             confirmModal.classList.add('flex');
         }
 
-        // Helper function for showing simple messages.
         function showMessage(title, message) {
             showCustomModal('message', title, message);
         }
 
-        // Helper function for showing confirmation prompts.
         function showConfirmation(title, message, onConfirm) {
             showCustomModal('confirm', title, message, onConfirm);
         }
@@ -385,47 +861,81 @@
             if (!confirmModal) return;
             confirmModal.classList.add('hidden');
             confirmModal.classList.remove('flex');
-            onConfirmCallback = null; // Clear the callback.
+            onConfirmCallback = null;
         }
 
         // --- DATA PERSISTENCE (localStorage) ---
-        // Saves the current student database and print queue to local storage.
-        function saveDataToLocalStorage() {
+        // Save student database (private to logged-in users)
+        function saveStudentDatabaseToLocalStorage() {
             localStorage.setItem('studentDatabase', JSON.stringify(studentDatabase));
-            localStorage.setItem('printQueue', JSON.stringify(printQueue));
-            console.log("Data saved to localStorage.");
+            console.log("Student database saved to localStorage.");
         }
 
-        // Loads student database and print queue from local storage.
-        function loadDataFromLocalStorage() {
+        // Load student database (private to logged-in users)
+        function loadStudentDatabaseFromLocalStorage() {
             const storedStudents = localStorage.getItem('studentDatabase');
-            const storedQueue = localStorage.getItem('printQueue');
-
             if (storedStudents) {
                 try {
                     studentDatabase = JSON.parse(storedStudents);
-                    updateDatabaseInfo(); // Update database info after loading.
-                } catch (e) {
+                    updateDatabaseInfo();
+                }
+                catch (e) {
                     console.error("Error parsing studentDatabase from localStorage", e);
-                    studentDatabase = []; // Reset if parsing fails.
+                    studentDatabase = [];
                     showMessage('Error', 'Gagal memuat database siswa dari penyimpanan lokal. Data mungkin rusak.');
                 }
             }
+        }
+
+        // Save print queue (public data)
+        function savePrintQueueToLocalStorage() {
+            localStorage.setItem('printQueue', JSON.stringify(printQueue));
+            console.log("Print queue saved to localStorage.");
+        }
+
+        // Load print queue (public data)
+        function loadPrintQueueFromLocalStorage() {
+            const storedQueue = localStorage.getItem('printQueue');
             if (storedQueue) {
                 try {
                     printQueue = JSON.parse(storedQueue);
-                    renderQueue(); // Render queue after loading.
-                } catch (e) {
+                }
+                catch (e) {
                     console.error("Error parsing printQueue from localStorage", e);
-                    printQueue = []; // Reset if parsing fails.
+                    printQueue = [];
                     showMessage('Error', 'Gagal memuat antrian izin dari penyimpanan lokal. Data mungkin rusak.');
                 }
             }
-            console.log("Data loaded from localStorage.");
+            renderQueue(); // Always render main queue on load (even if empty)
+        }
+
+        // Save employees to localStorage
+        function saveEmployeesToLocalStorage() {
+            localStorage.setItem('employees', JSON.stringify(employees));
+            console.log("Employee data saved to localStorage.");
+        }
+
+        // Load employees from localStorage
+        function loadEmployeesFromLocalStorage() {
+            const storedEmployees = localStorage.getItem('employees');
+            if (storedEmployees) {
+                try {
+                    employees = JSON.parse(storedEmployees);
+                } catch (e) {
+                    console.error("Error parsing employees from localStorage", e);
+                    // If parsing fails, revert to hardcoded default employees
+                    employees = [
+                        { username: 'admin', password: 'password123', name: 'Admin Utama', role: 'admin' },
+                        { username: 'guru1', password: 'passguru', name: 'Bapak Budi', role: 'staff' },
+                        { username: 'tu', password: 'passtu', name: 'Ibu Siti', role: 'staff' }
+                    ];
+                    showMessage('Peringatan', 'Gagal memuat data pegawai dari penyimpanan lokal. Menggunakan data default.');
+                }
+            }
+            // If no stored employees, the 'employees' array remains its hardcoded default
         }
 
         // --- CORE LOGIC ---
-        // Generates a PDF of individual permission slips for each student in the queue.
         function generateSlipsPDF() {
             if (printQueue.length === 0) {
                 showMessage("Antrian Kosong", "Daftar antrian kosong. Tidak ada data untuk dicetak.");
@@ -433,17 +943,14 @@
             }
 
             const { jsPDF } = window.jspdf;
-            // Initialize jsPDF in landscape A4 format.
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
             const pageW = doc.internal.pageSize.getWidth();
             const pageH = doc.internal.pageSize.getHeight();
-            const panelW = pageW / 3; // Divide page into 3 columns for slips.
-            const panelH = pageH / 2; // Divide page into 2 rows for slips.
-            const margin = 8; // Margin within each slip panel.
+            const panelW = pageW / 3;
+            const panelH = pageH / 2;
+            const margin = 8;
 
-            // Function to draw a single permission slip.
             const drawSlip = (x, y, student) => {
-                // Draw border for the slip panel.
                 doc.setDrawColor(150, 150, 150);
                 doc.rect(x, y, panelW, panelH);
 
@@ -452,26 +959,22 @@
                 const contentW = panelW - (margin * 2);
                 let currentY = contentY;
 
-                // Slip Title
                 doc.setFontSize(12);
                 doc.setFont(undefined, 'bold');
                 const title = "SURAT IJIN TIDAK MASUK SEKOLAH";
                 const titleWidth = doc.getTextWidth(title);
                 doc.text(title, x + (panelW / 2), currentY, { align: 'center' });
-                // Underline the title.
                 const underlineY = currentY + 1;
                 doc.setLineWidth(0.5);
                 doc.line(x + (panelW / 2) - (titleWidth / 2), underlineY, x + (panelW / 2) + (titleWidth / 2), underlineY);
                 currentY += 8;
 
-                // First paragraph of the slip.
                 doc.setFontSize(10);
                 doc.setFont(undefined, 'normal');
                 const p1 = "Surat ini menerangkan bahwa siswa tersebut dibawah ini telah diijinkan oleh orangtua/walinya untuk tidak masuk sekolah.";
                 doc.text(p1, contentX, currentY, { maxWidth: contentW });
                 currentY += 15;
 
-                // Student Data
                 doc.text("Nama", contentX, currentY);
                 doc.text(`: ${student.name}`, contentX + 20, currentY);
                 currentY += 6;
@@ -482,11 +985,9 @@
                 doc.text(`: ${student.reason}`, contentX + 20, currentY);
                 currentY += 12;
 
-                // Second paragraph.
                 const p2 = "Mohon diteruskan kepada petugas presensi untuk dilaksanakan. Terima kasih.";
                 doc.text(p2, contentX, currentY, { maxWidth: contentW });
 
-                // Signature section.
                 const signX = x + panelW - margin;
                 const signY = y + panelH - margin;
                 const formattedDate = activeDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -496,16 +997,15 @@
                 doc.text("Meri Wahyudi", signX, signY, { align: 'right' });
             };
 
-            // Iterate through the print queue and draw slips.
             printQueue.forEach((student, index) => {
-                const pageIndex = Math.floor(index / 6); // 6 slips per page (3 columns * 2 rows).
+                const pageIndex = Math.floor(index / 6);
                 if (pageIndex > 0 && index % 6 === 0) {
-                    doc.addPage(); // Add new page for every 6 slips.
+                    doc.addPage();
                 }
                 
                 const slipIndexOnPage = index % 6;
-                const col = slipIndexOnPage % 3; // Determine column (0, 1, or 2).
-                const row = Math.floor(slipIndexOnPage / 3); // Determine row (0 or 1).
+                const col = slipIndexOnPage % 3;
+                const row = Math.floor(slipIndexOnPage / 3);
 
                 const x = col * panelW;
                 const y = row * panelH;
@@ -514,10 +1014,9 @@
             });
             
             const fileName = `surat-izin-${activeDate.toISOString().slice(0,10)}.pdf`;
-            doc.output('dataurlnewwindow'); // Open the generated PDF in a new tab.
+            doc.output('dataurlnewwindow');
         }
 
-        // Generates a PDF report of all students in the current queue.
         function generateReportPDF() {
             if (printQueue.length === 0) {
                 showMessage("Antrian Kosong", "Daftar antrian kosong. Tidak ada data untuk dicetak.");
@@ -546,17 +1045,16 @@
             doc.autoTable({
                 head: [tableColumn],
                 body: tableRows,
-                startY: 30, // Start table below the title and subtitle.
+                startY: 30,
                 theme: 'grid',
                 headStyles: { fillColor: [241, 245, 249], textColor: [20, 20, 20] },
                 styles: { font: 'Inter', fontSize: 12 },
                 margin: { top: 10, right: 10, bottom: 10, left: 10 }
             });
             
-            doc.output('dataurlnewwindow'); // Open the generated PDF in a new tab.
+            doc.output('dataurlnewwindow');
         }
 
-        // Downloads an XLSX template file for importing student data.
         function downloadTemplate() {
             const headers = [
                 "Nama",
@@ -565,28 +1063,21 @@
                 "Nomor HP Wali"
             ];
 
-            const data = [headers]; // Only headers for an empty template.
+            const data = [headers];
 
-            // Create a new worksheet from the array of arrays.
             const ws = XLSX.utils.aoa_to_sheet(data);
-
-            // Create a new workbook.
             const wb = XLSX.utils.book_new();
-            // Append the worksheet to the workbook with a sheet name.
             XLSX.utils.book_append_sheet(wb, ws, "Data Siswa");
-
-            // Write the XLSX file and trigger download.
             XLSX.writeFile(wb, "template_data_siswa.xlsx");
 
             showMessage('Template Diunduh', 'Template Excel "template_data_siswa.xlsx" berhasil diunduh.');
         }
         
-        // Handles the upload of an XLSX file to import student data.
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) {
                 showMessage('Peringatan', 'Tidak ada file yang dipilih.');
-                event.target.value = ''; // Reset input file.
+                event.target.value = '';
                 return;
             }
 
@@ -595,7 +1086,7 @@
 
             if (fileExtension !== 'xlsx') {
                 showMessage('Format File Salah', 'Harap unggah file Excel dengan ekstensi .xlsx.');
-                event.target.value = ''; // Reset input file.
+                event.target.value = '';
                 return;
             }
 
@@ -605,22 +1096,20 @@
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
 
-                const sheetName = workbook.SheetNames[0]; // Get the first sheet.
+                const sheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[sheetName];
 
-                // Convert worksheet to JSON, treating the first row as headers.
                 const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
 
-                if (jsonData.length < 2) { // Minimum: header row + one data row.
+                if (jsonData.length < 2) {
                     showMessage('File Kosong', 'File Excel kosong atau tidak memiliki data yang cukup.');
                     event.target.value = '';
                     return;
                 }
 
-                const headers = jsonData[0]; // First row contains headers.
-                const studentsDataRows = jsonData.slice(1); // Student data starts from the second row.
+                const headers = jsonData[0];
+                const studentsDataRows = jsonData.slice(1);
 
-                // Validate required headers: Only 'Nama' and 'Kelas' are mandatory.
                 const requiredHeaders = ['Nama', 'Kelas'];
                 const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
 
@@ -632,27 +1121,22 @@
 
                 const newStudents = [];
                 let duplicatesFound = 0;
-                // Create a Set of existing student names (case-insensitive) for duplicate checking.
                 const seenNamesInDatabase = new Set(studentDatabase.map(s => s.name.toLowerCase()));
 
                 studentsDataRows.forEach(row => {
-                    // Get data based on header index.
                     const nameIndex = headers.indexOf('Nama');
                     const classIndex = headers.indexOf('Kelas');
-                    const waliIndex = headers.indexOf('Wali'); // This will be -1 if 'Wali' column is not present
-                    const nomorHpWaliIndex = headers.indexOf('Nomor HP Wali'); // This will be -1 if 'Nomor HP Wali' column is not present
+                    const waliIndex = headers.indexOf('Wali');
+                    const nomorHpWaliIndex = headers.indexOf('Nomor HP Wali');
 
                     const name = row[nameIndex] ? String(row[nameIndex]).trim() : '';
                     const studentClass = row[classIndex] ? String(row[classIndex]).trim() : '';
-                    // If column index is -1 (column not found) or value is empty, default to empty string.
                     const wali = waliIndex !== -1 && row[waliIndex] ? String(row[waliIndex]).trim() : '';
                     const nomorHpWali = nomorHpWaliIndex !== -1 && row[nomorHpWaliIndex] ? String(row[nomorHpWaliIndex]).trim() : '';
 
-                    // Basic validation: name and class cannot be empty.
                     if (name && studentClass) {
-                        // Check for duplicates before adding.
                         if (!seenNamesInDatabase.has(name.toLowerCase())) {
-                            seenNamesInDatabase.add(name.toLowerCase()); // Add to set to prevent duplicates from the same file.
+                            seenNamesInDatabase.add(name.toLowerCase());
                             newStudents.push({
                                 name: name,
                                 class: studentClass,
@@ -666,10 +1150,9 @@
                 });
 
                 if (newStudents.length > 0) {
-                    // Merge new students with the existing database.
                     studentDatabase = [...studentDatabase, ...newStudents];
-                    saveDataToLocalStorage(); // Save changes to local storage.
-                    updateDatabaseInfo(); // Update database info display.
+                    saveStudentDatabaseToLocalStorage();
+                    updateDatabaseInfo();
                     let successMessage = `Berhasil mengimpor ${newStudents.length} siswa baru dari file Excel.`;
                     if (duplicatesFound > 0) {
                         successMessage += `\n${duplicatesFound} data duplikat (nama yang sama) diabaikan.`;
@@ -678,27 +1161,25 @@
                 } else {
                     showMessage('Tidak Ada Siswa Valid', 'Tidak ada siswa valid yang ditemukan di file Excel untuk diimpor.');
                 }
-                event.target.value = ''; // Reset file input after processing.
+                event.target.value = '';
             };
 
             reader.onerror = function(ex) {
                 showMessage('Error Membaca File', 'Gagal membaca file. Pastikan format file Excel Anda benar.');
                 console.error('File Reader Error:', ex);
-                event.target.value = ''; // Reset input file.
+                event.target.value = '';
             };
 
             reader.readAsArrayBuffer(file);
         }
 
-        // Handles student search input and displays autocomplete results.
         function handleSearch(e) {
             const query = e.target.value.toLowerCase();
             if (!autocompleteResults) return;
-            autocompleteResults.innerHTML = ''; // Clear previous results.
+            autocompleteResults.innerHTML = '';
 
             if (query.length < 1) {
                 autocompleteResults.classList.add('hidden');
-                // Clear related inputs and reset selected student if search is empty.
                 if (classInput) classInput.value = '';
                 if (waliInput) waliInput.value = '';
                 selectedStudent = null;
@@ -706,7 +1187,6 @@
                 return;
             }
 
-            // Filter student database for matches (up to 10 results).
             const matches = studentDatabase.filter(s => s.name.toLowerCase().includes(query)).slice(0, 10);
             
             if (matches.length > 0) {
@@ -715,7 +1195,6 @@
                     const item = document.createElement('div');
                     item.className = 'autocomplete-item p-2 hover:bg-sky-500 hover:text-white cursor-pointer dark:hover:bg-blue-700';
                     item.textContent = `${match.name} (${match.class})`;
-                    // Store full student data in dataset for easy retrieval.
                     item.dataset.name = match.name;
                     item.dataset.class = match.class;
                     item.dataset.wali = match.wali || '';
@@ -727,19 +1206,17 @@
             }
         }
         
-        // Selects a student from the autocomplete results and populates the form.
         function selectStudentFromSearch(student) {
             selectedStudent = student;
             if (searchInput) searchInput.value = student.name;
             if (classInput) classInput.value = student.class;
-            if (waliInput) waliInput.value = student.wali || ''; // Populate wali if available.
+            if (waliInput) waliInput.value = student.wali || '';
             if (autocompleteResults) autocompleteResults.classList.add('hidden');
-            if (addButton) addButton.disabled = false; // Enable add button.
+            if (addButton) addButton.disabled = false;
         }
 
-        // Adds the selected student to the daily permission queue.
         function addToQueue(event) {
-            event.preventDefault(); // Prevent form submission.
+            event.preventDefault();
             if (!selectedStudent) { 
                 showMessage('Peringatan', 'Pilih siswa dari hasil pencarian terlebih dahulu.'); 
                 return; 
@@ -749,55 +1226,49 @@
                 showMessage('Peringatan', 'Nama Orang Tua / Wali harus diisi.'); 
                 return; 
             }
-            // Check if student is already in the queue.
             const isAlreadyInQueue = printQueue.some(student => student.name.toLowerCase() === selectedStudent.name.toLowerCase());
             if (isAlreadyInQueue) {
                 showMessage('Duplikat Antrian', `Siswa bernama "${selectedStudent.name}" sudah ada di dalam antrian.`);
                 return;
             }
-            // Add student to queue with reason and wali name.
             printQueue.push({ ...selectedStudent, reason: reasonSelect.value, wali: waliName });
-            saveDataToLocalStorage(); // Save updated queue.
-            selectedStudent = null; // Clear selected student.
-            if (searchForm) searchForm.reset(); // Reset search form.
-            if (addButton) addButton.disabled = true; // Disable add button.
-            renderQueue(); // Re-render the queue table.
-            // Clear class and wali inputs.
+            savePrintQueueToLocalStorage(); // Save printQueue
+            selectedStudent = null;
+            if (searchForm) searchForm.reset();
+            if (addButton) addButton.disabled = true;
+            renderQueue();
             if (classInput) classInput.value = '';
             if (waliInput) waliInput.value = '';
         }
 
-        // Removes a student from the permission queue by index.
         function removeFromQueue(index) {
-            printQueue.splice(index, 1); // Remove student from array.
-            saveDataToLocalStorage(); // Save updated queue.
-            renderQueue(); // Re-render the queue table.
+            printQueue.splice(index, 1);
+            savePrintQueueToLocalStorage(); // Save printQueue
+            renderQueue();
         }
 
-        // Resets (clears) the entire daily permission queue.
         function resetQueue() {
             showConfirmation('Hapus Data Hari Ini?', 'Anda yakin ingin menghapus semua data antrian hari ini? Ini tidak akan menghapus database siswa.', () => {
-                printQueue = []; // Clear the queue.
-                saveDataToLocalStorage(); // Save empty queue.
-                renderQueue(); // Re-render (will show empty message).
+                printQueue = [];
+                savePrintQueueToLocalStorage(); // Save empty printQueue
+                renderQueue();
                 showMessage('Data Dihapus', 'Data antrian hari ini telah dihapus.');
             });
         }
 
-        // Deletes the entire student database.
         function deleteDatabase() {
             showConfirmation('Hapus Seluruh Database?', 'PERINGATAN: Aksi ini tidak bisa dibatalkan. Seluruh data siswa yang dimuat akan hilang.', () => {
-                studentDatabase = []; // Clear the student database.
-                printQueue = []; // Also clear the queue as database is gone.
-                saveDataToLocalStorage(); // Save empty database and queue.
-                if (searchInput) searchInput.value = ''; // Clear search input.
-                updateDatabaseInfo(); // Update database info.
-                renderQueue(); // Re-render queue (will be empty).
+                studentDatabase = [];
+                printQueue = []; // Also clear queue as student data is gone
+                saveStudentDatabaseToLocalStorage();
+                savePrintQueueToLocalStorage(); // Save empty printQueue
+                if (searchInput) searchInput.value = '';
+                updateDatabaseInfo();
+                renderQueue();
                 showMessage('Database Dihapus', 'Database telah dihapus.');
             });
         }
 
-        // Adds a new student manually to the student database.
         function addStudentToDatabase(event) {
             event.preventDefault();
             const newNameInput = document.getElementById('manual-nama');
@@ -810,30 +1281,73 @@
                 showMessage('Input Kosong', 'Nama dan Kelas siswa baru tidak boleh kosong.'); 
                 return; 
             }
-            // Check for duplicate names in the database.
             if (studentDatabase.some(s => s.name.toLowerCase() === newName.toLowerCase())) {
                 showMessage('Duplikat Siswa', 'Siswa dengan nama ini sudah ada di database.');
                 return;
             }
-            // Add new student with default empty wali/nomorHpWali.
             studentDatabase.push({ name: newName, class: newClass, wali: '', nomorHpWali: '' });
-            saveDataToLocalStorage(); // Save updated database.
-            updateDatabaseInfo(); // Update database info display.
+            saveStudentDatabaseToLocalStorage();
+            updateDatabaseInfo();
             showMessage('Siswa Ditambahkan', `Siswa "${newName}" berhasil ditambahkan ke database.`);
-            if (manualAddForm) manualAddForm.reset(); // Reset manual add form.
-            if (manualAddModal) manualAddModal.classList.add('hidden'); // Hide modal.
+            if (manualAddForm) manualAddForm.reset();
+            if (manualAddModal) manualAddModal.classList.add('hidden');
         }
 
-        // Updates the display showing the number of students in the database.
+        // NEW: Add Employee
+        function addEmployee(event) {
+            event.preventDefault();
+            const username = newEmployeeUsernameInput.value.trim();
+            const password = newEmployeePasswordInput.value.trim();
+            const name = newEmployeeNameInput.value.trim();
+            const role = newEmployeeRoleSelect.value;
+
+            if (!username || !password || !name) {
+                showMessage('Input Kosong', 'Username, Password, dan Nama Lengkap pegawai tidak boleh kosong.');
+                return;
+            }
+
+            if (employees.some(emp => emp.username.toLowerCase() === username.toLowerCase())) {
+                showMessage('Duplikat Username', 'Username ini sudah digunakan. Silakan pilih username lain.');
+                return;
+            }
+
+            employees.push({ username, password, name, role });
+            saveEmployeesToLocalStorage();
+            renderEmployeesTable(); // Re-render table
+            addEmployeeForm.reset(); // Clear form
+            showMessage('Pegawai Ditambahkan', `Pegawai "${name}" (${username}) berhasil ditambahkan.`);
+        }
+
+        // NEW: Delete Employee
+        function deleteEmployee(usernameToDelete) {
+            showConfirmation('Hapus Pegawai?', `Anda yakin ingin menghapus pegawai dengan username "${usernameToDelete}"?`, () => {
+                // Prevent deleting the currently logged-in admin
+                if (loggedInEmployee && loggedInEmployee.username === usernameToDelete && loggedInEmployee.role === 'admin') {
+                    showMessage('Tidak Diizinkan', 'Anda tidak bisa menghapus akun admin yang sedang login.');
+                    return;
+                }
+
+                const initialLength = employees.length;
+                employees = employees.filter(emp => emp.username !== usernameToDelete);
+                if (employees.length < initialLength) {
+                    saveEmployeesToLocalStorage();
+                    renderEmployeesTable(); // Re-render table
+                    showMessage('Pegawai Dihapus', `Pegawai dengan username "${usernameToDelete}" berhasil dihapus.`);
+                } else {
+                    showMessage('Gagal Hapus', `Pegawai dengan username "${usernameToDelete}" tidak ditemukan.`);
+                }
+            });
+        }
+
+
         function updateDatabaseInfo() {
             if (databaseInfo) databaseInfo.textContent = `${studentDatabase.length} siswa di database.`;
             if (searchInput) {
-                searchInput.disabled = studentDatabase.length === 0; // Enable/disable search based on database size.
-                if(studentDatabase.length > 0) searchInput.focus(); // Focus search if database has students.
+                searchInput.disabled = studentDatabase.length === 0;
+                if(studentDatabase.length > 0) searchInput.focus();
             }
         }
         
-        // Updates the displayed active date.
         function updateDateDisplay() {
             if (!activeDateDisplay) return;
             activeDateDisplay.textContent = activeDate.toLocaleDateString('id-ID', {
@@ -841,56 +1355,57 @@
             });
         }
         
-        // Applies the selected theme (light/dark) to the document.
         function applyTheme(theme) {
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
-            localStorage.setItem('appTheme', theme); // Save theme preference.
+            localStorage.setItem('appTheme', theme);
             const themeRadio = document.querySelector(`input[name="theme-setting"][value="${theme}"]`);
-            if(themeRadio) themeRadio.checked = true; // Set the correct radio button.
+            if(themeRadio) themeRadio.checked = true;
         }
 
         // --- EVENT LISTENERS ---
-        // Toggle submenu visibility.
+        // Open login form modal when 'Masuk' button is clicked
+        if (loginButton) loginButton.addEventListener('click', () => {
+            loginFormModal.classList.remove('hidden');
+            loginUsernameInput.focus(); // Focus on username input
+        });
+        // Close login form modal
+        if (closeLoginFormModalBtn) closeLoginFormModalBtn.addEventListener('click', () => {
+            loginFormModal.classList.add('hidden');
+            loginForm.reset(); // Clear form fields
+        });
+        // Handle login form submission
+        if (loginForm) loginForm.addEventListener('submit', handleEmployeeLogin);
+
+        // Logout button
+        if (logoutButton) logoutButton.addEventListener('click', handleLogout);
+
         if (menuDatabase) menuDatabase.addEventListener('click', () => {
             if (submenuDatabase) submenuDatabase.classList.toggle('open');
             menuDatabase.classList.toggle('active');
         });
-        // Handle XLSX file upload.
         if (fileInput) fileInput.addEventListener('change', handleFileUpload);
-        // Download XLSX template.
         if (downloadTemplateButton) downloadTemplateButton.addEventListener('click', downloadTemplate);
-        // Delete entire student database.
         if (deleteDatabaseButton) deleteDatabaseButton.addEventListener('click', deleteDatabase);
-        // Handle search input for autocomplete.
         if (searchInput) searchInput.addEventListener('input', handleSearch);
-        // Add selected student to queue on form submission.
         if (searchForm) searchForm.addEventListener('submit', addToQueue);
-        // Reset daily queue.
         if (resetQueueButton) resetQueueButton.addEventListener('click', resetQueue);
-        // Print report PDF.
         if (printPdfButton) printPdfButton.addEventListener('click', generateReportPDF);
-        // Print individual slips PDF.
         if (printSlipsButton) printSlipsButton.addEventListener('click', generateSlipsPDF);
         
-        // Handle manual add student form submission.
         if (manualAddForm) manualAddForm.addEventListener('submit', addStudentToDatabase);
-        // Open manual add modal.
         if (openManualAddModalBtn) openManualAddModalBtn.addEventListener('click', () => {
             manualAddModal.classList.remove('hidden');
-            document.getElementById('manual-nama').focus(); // Focus on first input.
+            document.getElementById('manual-nama').focus();
         });
-        // Close manual add modal.
         if (closeModalBtn) closeModalBtn.addEventListener('click', () => manualAddModal.classList.add('hidden'));
-        // Close manual add modal when clicking outside.
         if (manualAddModal) manualAddModal.addEventListener('click', (e) => {
             if (e.target === manualAddModal) manualAddModal.classList.add('hidden');
         });
 
-        // Event delegation for removing students from the queue.
         if (queueContainer) queueContainer.addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('remove-queue-btn')) {
                 const index = parseInt(e.target.dataset.index, 10);
@@ -898,10 +1413,8 @@
             }
         });
         
-        // Event delegation for selecting autocomplete results.
         if (autocompleteResults) autocompleteResults.addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('autocomplete-item')) {
-                // Construct student object from dataset attributes.
                 const student = {
                     name: e.target.dataset.name,
                     class: e.target.dataset.class,
@@ -912,92 +1425,101 @@
             }
         });
 
-        // Hide autocomplete results when clicking outside the search form.
         document.addEventListener('click', (e) => {
             if (searchForm && !searchForm.contains(e.target) && autocompleteResults) {
                 autocompleteResults.classList.add('hidden');
             }
         });
 
-        // Handle OK button click in the confirmation/message modal.
         if (confirmOkBtn) confirmOkBtn.addEventListener('click', () => {
-            // Check if it's a simple message (cancel button hidden) or a confirmation.
             if (confirmCancelBtn.classList.contains('hidden')) { 
-                hideConfirmation(); // Just close for messages.
+                hideConfirmation();
             } else { 
                 if (typeof onConfirmCallback === 'function') {
-                    onConfirmCallback(); // Execute callback for confirmations.
+                    onConfirmCallback();
                 }
                 hideConfirmation();
             }
         });
-        // Handle Cancel button click in the confirmation modal.
         if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', hideConfirmation);
 
-        // Settings Modal Listeners
-        // Open settings modal.
         if(openSettingsModalBtn) openSettingsModalBtn.addEventListener('click', () => {
             settingsModal.classList.remove('hidden');
-            // Set radio buttons based on current settings.
             document.querySelector(`input[name="date-setting"][value="${dateMode}"]`).checked = true;
             if (dateMode === 'manual') {
                 manualDateInput.classList.remove('hidden');
-                manualDateInput.valueAsDate = activeDate || new Date(); // Set manual date input to current active date.
+                manualDateInput.valueAsDate = activeDate || new Date();
             } else {
                 manualDateInput.classList.add('hidden');
             }
             document.querySelector(`input[name="theme-setting"][value="${currentTheme}"]`).checked = true;
         });
-        // Close settings modal.
         if(closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-        // Close settings modal when clicking outside.
         if(settingsModal) settingsModal.addEventListener('click', (e) => {
             if(e.target === settingsModal) settingsModal.classList.add('hidden');
         });
 
-        // Handle date setting radio button changes.
         dateSettingRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 dateMode = e.target.value;
                 if (dateMode === 'manual') {
                     manualDateInput.classList.remove('hidden');
-                    manualDateInput.valueAsDate = activeDate || new Date(); // Set manual date input.
-                    activeDate = new Date(manualDateInput.valueAsDate.getTime() + manualDateInput.valueAsDate.getTimezoneOffset() * 60000); // Adjust for timezone
+                    manualDateInput.valueAsDate = activeDate || new Date();
+                    activeDate = new Date(manualDateInput.valueAsDate.getTime() + manualDateInput.valueAsDate.getTimezoneOffset() * 60000);
                 } else {
                     manualDateInput.classList.add('hidden');
-                    activeDate = new Date(); // Revert to today's date.
+                    activeDate = new Date();
                 }
-                updateDateDisplay(); // Update displayed date.
+                updateDateDisplay();
             });
         });
         
-        // Handle manual date input change.
         if(manualDateInput) manualDateInput.addEventListener('change', (e) => {
             const selectedDate = new Date(e.target.value);
-            // Adjust for timezone offset to ensure correct date.
             const timezoneOffset = selectedDate.getTimezoneOffset() * 60000; 
             activeDate = new Date(selectedDate.getTime() + timezoneOffset);
-            updateDateDisplay(); // Update displayed date.
+            updateDateDisplay();
         });
         
-        // Handle theme setting radio button changes.
-        themeSettingRadios.forEach(radio => {
+themeSettingRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 currentTheme = e.target.value;
-                applyTheme(currentTheme); // Apply the selected theme.
+                applyTheme(currentTheme);
             });
         });
 
-        // --- INITIALIZATION ---
-        // Ensures the app initializes correctly after the DOM is fully loaded.
-        setInitialUIState();
-    }
+        // NEW: Employee Management Event Listeners
+        if (menuEmployeeManagement) menuEmployeeManagement.addEventListener('click', () => {
+            if (submenuEmployeeManagement) submenuEmployeeManagement.classList.toggle('open');
+            menuEmployeeManagement.classList.toggle('active');
+        });
+        if (openEmployeeManagementModalBtn) openEmployeeManagementModalBtn.addEventListener('click', () => {
+            employeeManagementModal.classList.remove('hidden');
+            renderEmployeesTable(); // Render table when modal opens
+            newEmployeeUsernameInput.focus(); // Focus on first input
+        });
+        if (closeEmployeeManagementModalBtn) closeEmployeeManagementModalBtn.addEventListener('click', () => {
+            employeeManagementModal.classList.add('hidden');
+            addEmployeeForm.reset(); // Clear add form
+        });
+        if (employeeManagementModal) employeeManagementModal.addEventListener('click', (e) => {
+            if (e.target === employeeManagementModal) {
+                employeeManagementModal.classList.add('hidden');
+                addEmployeeForm.reset();
+            }
+        });
+        if (addEmployeeForm) addEmployeeForm.addEventListener('submit', addEmployee);
+        if (employeeTableBody) employeeTableBody.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('delete-employee-btn')) {
+                const usernameToDelete = e.target.dataset.username;
+                if (usernameToDelete) {
+                    deleteEmployee(usernameToDelete);
+                }
+            }
+        });
 
-    // Check if the DOM is already loaded. If not, wait for DOMContentLoaded.
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeApp);
-    } else {
-        initializeApp();
+
+        setInitialUIState(); // Initial UI setup
     }
     </script>
 </body>
