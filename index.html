@@ -24,10 +24,6 @@
             background-color: #e0f2fe;
             color: #0c4a6e;
         }
-        .dark .menu-item.active {
-            background-color: #1e293b;
-            color: #e2e8f0;
-        }
         .menu-item.active svg.arrow {
             transform: rotate(90deg);
         }
@@ -129,7 +125,7 @@
             <div class="mt-auto flex justify-between items-center text-xs text-slate-400 pt-4 border-t">
                 <span id="database-info">Database kosong.</span>
                 <button id="open-settings-modal" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
-                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </button>
             </div>
         </aside>
@@ -151,6 +147,7 @@
         </main>
     </div>
 
+    <!-- Manual Add Student Modal -->
     <div id="manual-add-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <div class="flex justify-between items-center mb-4">
@@ -158,20 +155,21 @@
                 <button id="close-manual-add-modal-button" class="text-slate-500 hover:text-slate-800">&times;</button>
             </div>
             <form id="manual-add-form" class="space-y-4">
-                   <p class="text-sm text-slate-600">Siswa yang ditambahkan di sini akan langsung bisa dicari.</p>
-                   <div>
-                       <label for="manual-nama" class="block text-sm font-medium text-slate-700">Nama Siswa Baru</label>
-                       <input type="text" id="manual-nama" placeholder="Nama Lengkap" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
-                   </div>
-                   <div>
-                       <label for="manual-kelas" class="block text-sm font-medium text-slate-700">Kelas</label>
-                       <input type="text" id="manual-kelas" placeholder="Contoh: 9A" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
-                   </div>
-                   <button type="submit" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700">Tambah ke Database</button>
+                    <p class="text-sm text-slate-600">Siswa yang ditambahkan di sini akan langsung bisa dicari.</p>
+                    <div>
+                        <label for="manual-nama" class="block text-sm font-medium text-slate-700">Nama Siswa Baru</label>
+                        <input type="text" id="manual-nama" placeholder="Nama Lengkap" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
+                    </div>
+                    <div>
+                        <label for="manual-kelas" class="block text-sm font-medium text-slate-700">Kelas</label>
+                        <input type="text" id="manual-kelas" placeholder="Contoh: 9A" required class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700">Tambah ke Database</button>
             </form>
         </div>
     </div>
 
+    <!-- Confirmation / Message Modal (Reused) -->
     <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
             <h3 id="confirm-title" class="text-lg font-bold mb-4">Konfirmasi Aksi</h3>
@@ -183,6 +181,7 @@
         </div>
     </div>
     
+    <!-- Settings Modal -->
     <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <div class="flex justify-between items-center mb-6">
@@ -224,21 +223,29 @@
     <script>
     function initializeApp() {
         // --- STATE MANAGEMENT ---
+        // Array to store all student data loaded from local storage or added manually.
         let studentDatabase = [];
+        // Array to store students currently in the daily permission queue.
         let printQueue = [];
+        // Stores the student object selected from the autocomplete search.
         let selectedStudent = null;
+        // Callback function for the confirmation modal.
         let onConfirmCallback = null;
+        // The date currently active for reports and queue display.
         let activeDate = new Date();
-        let dateMode = 'auto'; // 'auto' or 'manual'
-        let currentTheme = localStorage.getItem('appTheme') || 'light'; // Simpan tema di localStorage
+        // Mode for date selection: 'auto' (today) or 'manual'.
+        let dateMode = 'auto';
+        // Current theme: 'light' or 'dark'. Loaded from local storage.
+        let currentTheme = localStorage.getItem('appTheme') || 'light';
 
         // --- DOM ELEMENTS ---
+        // Caching references to frequently used DOM elements for performance.
         const appTitle = document.querySelector('h1');
         const appVersion = document.querySelector('p.text-sm.text-slate-500');
         const activeDateDisplay = document.getElementById('active-date-display');
         const menuDatabase = document.getElementById('menu-database');
         const submenuDatabase = document.getElementById('submenu-database');
-        const fileInput = document.getElementById('csv-file-input'); // Tetap nama ID ini dari kode Anda
+        const fileInput = document.getElementById('csv-file-input');
         const downloadTemplateButton = document.getElementById('download-template-button');
         const deleteDatabaseButton = document.getElementById('delete-database-button');
         const databaseInfo = document.getElementById('database-info');
@@ -274,28 +281,32 @@
         const themeSettingRadios = document.querySelectorAll('input[name="theme-setting"]');
         
         // --- INITIAL UI STATE ---
+        // Sets the initial display state of UI elements and loads data.
         function setInitialUIState() {
             if (appTitle) appTitle.textContent = "Aplikasi Izin Siswa";
-            if (appVersion) appVersion.textContent = "Versi 2.1 (XLSX Support)"; // Perbarui versi
-            if (searchInput) searchInput.disabled = true;
-            if (addButton) addButton.disabled = true;
+            if (appVersion) appVersion.textContent = "Versi 2.1 (XLSX Support)";
+            if (searchInput) searchInput.disabled = true; // Disable search until database is loaded/populated.
+            if (addButton) addButton.disabled = true; // Disable add button initially.
             
-            applyTheme(currentTheme);
-            updateDateDisplay();
-            renderQueue();
-            loadDataFromLocalStorage(); // Muat data saat inisialisasi
+            applyTheme(currentTheme); // Apply the saved or default theme.
+            updateDateDisplay(); // Display the current active date.
+            loadDataFromLocalStorage(); // Load student and queue data from local storage.
         }
 
         // --- RENDER FUNCTIONS ---
+        // Renders the current state of the permission queue into the table.
         function renderQueue() {
             if (!queueContainer || !queueTitle) return;
-            queueContainer.innerHTML = '';
-            queueTitle.textContent = `Daftar Antrian (${printQueue.length} Siswa)`;
+            queueContainer.innerHTML = ''; // Clear existing table content.
+            queueTitle.textContent = `Daftar Antrian (${printQueue.length} Siswa)`; // Update queue title.
+
             if (printQueue.length === 0) {
+                // Display a message if the queue is empty.
                 queueContainer.innerHTML = `<div class="h-full flex items-center justify-center"><p class="text-base text-slate-400">Antrian kosong.</p></div>`;
                 return;
             }
             
+            // Create the table structure.
             const table = document.createElement('table');
             table.className = 'w-full text-sm text-left text-slate-500';
             table.innerHTML = `
@@ -313,12 +324,13 @@
             `;
             
             const tableBody = table.querySelector('#queue-table-body');
+            // Populate the table with students from the printQueue.
             printQueue.forEach((student, index) => {
                 const row = document.createElement('tr');
-                row.className = 'bg-white border-b hover:bg-slate-50';
+                row.className = 'bg-white border-b hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700';
                 row.innerHTML = `
-                    <td class="px-6 py-4 font-medium text-slate-900">${index + 1}</td>
-                    <td class="px-6 py-4 font-semibold text-slate-800">${student.name}</td>
+                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">${index + 1}</td>
+                    <td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">${student.name}</td>
                     <td class="px-6 py-4">${student.class}</td>
                     <td class="px-6 py-4">${student.wali}</td>
                     <td class="px-6 py-4"><span class="font-medium text-amber-600">${student.reason}</span></td>
@@ -333,29 +345,58 @@
         }
         
         // --- MODAL & NOTIFICATION LOGIC ---
-        function showConfirmation(title, message, onConfirm) {
-            if (!confirmModal || !confirmTitle || !confirmMessage) return;
+        // Displays a custom modal for confirmations or simple messages.
+        // type: 'confirm' (shows Yes/No buttons) or 'message' (shows only OK button).
+        // title: The title of the modal.
+        // message: The main content message.
+        // onConfirm: Callback function executed if 'Ya, Lanjutkan' (for confirm) or 'OK' (for message) is clicked.
+        function showCustomModal(type, title, message, onConfirm = null) {
+            if (!confirmModal || !confirmTitle || !confirmMessage || !confirmOkBtn || !confirmCancelBtn) return;
+
             confirmTitle.textContent = title;
             confirmMessage.textContent = message;
             onConfirmCallback = onConfirm;
+
+            if (type === 'message') {
+                confirmOkBtn.textContent = 'OK';
+                confirmOkBtn.className = 'px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700';
+                confirmCancelBtn.classList.add('hidden'); // Hide cancel button for messages
+            } else { // type === 'confirm'
+                confirmOkBtn.textContent = 'Ya, Lanjutkan';
+                confirmOkBtn.className = 'px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700';
+                confirmCancelBtn.classList.remove('hidden'); // Show cancel button for confirmations
+            }
+
             confirmModal.classList.remove('hidden');
             confirmModal.classList.add('flex');
+        }
+
+        // Helper function for showing simple messages.
+        function showMessage(title, message) {
+            showCustomModal('message', title, message);
+        }
+
+        // Helper function for showing confirmation prompts.
+        function showConfirmation(title, message, onConfirm) {
+            showCustomModal('confirm', title, message, onConfirm);
         }
 
         function hideConfirmation() {
             if (!confirmModal) return;
             confirmModal.classList.add('hidden');
             confirmModal.classList.remove('flex');
-            onConfirmCallback = null;
+            onConfirmCallback = null; // Clear the callback.
         }
 
         // --- DATA PERSISTENCE (localStorage) ---
+        // Saves the current student database and print queue to local storage.
         function saveDataToLocalStorage() {
             localStorage.setItem('studentDatabase', JSON.stringify(studentDatabase));
             localStorage.setItem('printQueue', JSON.stringify(printQueue));
             console.log("Data saved to localStorage.");
         }
 
+        // Loads student database and print queue from local storage.
         function loadDataFromLocalStorage() {
             const storedStudents = localStorage.getItem('studentDatabase');
             const storedQueue = localStorage.getItem('printQueue');
@@ -363,42 +404,47 @@
             if (storedStudents) {
                 try {
                     studentDatabase = JSON.parse(storedStudents);
-                    updateDatabaseInfo();
+                    updateDatabaseInfo(); // Update database info after loading.
                 } catch (e) {
                     console.error("Error parsing studentDatabase from localStorage", e);
-                    studentDatabase = []; // Reset jika ada error
+                    studentDatabase = []; // Reset if parsing fails.
+                    showMessage('Error', 'Gagal memuat database siswa dari penyimpanan lokal. Data mungkin rusak.');
                 }
             }
             if (storedQueue) {
                 try {
                     printQueue = JSON.parse(storedQueue);
-                    renderQueue();
+                    renderQueue(); // Render queue after loading.
                 } catch (e) {
                     console.error("Error parsing printQueue from localStorage", e);
-                    printQueue = []; // Reset jika ada error
+                    printQueue = []; // Reset if parsing fails.
+                    showMessage('Error', 'Gagal memuat antrian izin dari penyimpanan lokal. Data mungkin rusak.');
                 }
             }
             console.log("Data loaded from localStorage.");
         }
 
         // --- CORE LOGIC ---
+        // Generates a PDF of individual permission slips for each student in the queue.
         function generateSlipsPDF() {
             if (printQueue.length === 0) {
-                alert("Daftar antrian kosong. Tidak ada data untuk dicetak.");
+                showMessage("Antrian Kosong", "Daftar antrian kosong. Tidak ada data untuk dicetak.");
                 return;
             }
 
             const { jsPDF } = window.jspdf;
+            // Initialize jsPDF in landscape A4 format.
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
             const pageW = doc.internal.pageSize.getWidth();
             const pageH = doc.internal.pageSize.getHeight();
-            const panelW = pageW / 3;
-            const panelH = pageH / 2;
-            const margin = 8; // Margin dalam setiap panel
+            const panelW = pageW / 3; // Divide page into 3 columns for slips.
+            const panelH = pageH / 2; // Divide page into 2 rows for slips.
+            const margin = 8; // Margin within each slip panel.
 
+            // Function to draw a single permission slip.
             const drawSlip = (x, y, student) => {
-                // Gambar garis tepi panel
-                doc.setDrawColor(150, 150, 150); // Warna abu-abu
+                // Draw border for the slip panel.
+                doc.setDrawColor(150, 150, 150);
                 doc.rect(x, y, panelW, panelH);
 
                 const contentX = x + margin;
@@ -406,26 +452,26 @@
                 const contentW = panelW - (margin * 2);
                 let currentY = contentY;
 
-                // Judul
+                // Slip Title
                 doc.setFontSize(12);
                 doc.setFont(undefined, 'bold');
                 const title = "SURAT IJIN TIDAK MASUK SEKOLAH";
                 const titleWidth = doc.getTextWidth(title);
                 doc.text(title, x + (panelW / 2), currentY, { align: 'center' });
-                // Garis bawah judul
+                // Underline the title.
                 const underlineY = currentY + 1;
                 doc.setLineWidth(0.5);
                 doc.line(x + (panelW / 2) - (titleWidth / 2), underlineY, x + (panelW / 2) + (titleWidth / 2), underlineY);
                 currentY += 8;
 
-                // Paragraf 1
+                // First paragraph of the slip.
                 doc.setFontSize(10);
                 doc.setFont(undefined, 'normal');
                 const p1 = "Surat ini menerangkan bahwa siswa tersebut dibawah ini telah diijinkan oleh orangtua/walinya untuk tidak masuk sekolah.";
                 doc.text(p1, contentX, currentY, { maxWidth: contentW });
                 currentY += 15;
 
-                // Data Siswa
+                // Student Data
                 doc.text("Nama", contentX, currentY);
                 doc.text(`: ${student.name}`, contentX + 20, currentY);
                 currentY += 6;
@@ -436,11 +482,11 @@
                 doc.text(`: ${student.reason}`, contentX + 20, currentY);
                 currentY += 12;
 
-                // Paragraf 2
+                // Second paragraph.
                 const p2 = "Mohon diteruskan kepada petugas presensi untuk dilaksanakan. Terima kasih.";
                 doc.text(p2, contentX, currentY, { maxWidth: contentW });
 
-                // Tanda Tangan
+                // Signature section.
                 const signX = x + panelW - margin;
                 const signY = y + panelH - margin;
                 const formattedDate = activeDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -450,15 +496,16 @@
                 doc.text("Meri Wahyudi", signX, signY, { align: 'right' });
             };
 
+            // Iterate through the print queue and draw slips.
             printQueue.forEach((student, index) => {
-                const pageIndex = Math.floor(index / 6);
+                const pageIndex = Math.floor(index / 6); // 6 slips per page (3 columns * 2 rows).
                 if (pageIndex > 0 && index % 6 === 0) {
-                    doc.addPage();
+                    doc.addPage(); // Add new page for every 6 slips.
                 }
                 
                 const slipIndexOnPage = index % 6;
-                const col = slipIndexOnPage % 3;
-                const row = Math.floor(slipIndexOnPage / 3);
+                const col = slipIndexOnPage % 3; // Determine column (0, 1, or 2).
+                const row = Math.floor(slipIndexOnPage / 3); // Determine row (0 or 1).
 
                 const x = col * panelW;
                 const y = row * panelH;
@@ -467,12 +514,13 @@
             });
             
             const fileName = `surat-izin-${activeDate.toISOString().slice(0,10)}.pdf`;
-            doc.output('dataurlnewwindow');
+            doc.output('dataurlnewwindow'); // Open the generated PDF in a new tab.
         }
 
+        // Generates a PDF report of all students in the current queue.
         function generateReportPDF() {
             if (printQueue.length === 0) {
-                alert("Daftar antrian kosong. Tidak ada data untuk dicetak.");
+                showMessage("Antrian Kosong", "Daftar antrian kosong. Tidak ada data untuk dicetak.");
                 return;
             }
 
@@ -498,19 +546,18 @@
             doc.autoTable({
                 head: [tableColumn],
                 body: tableRows,
-                startY: 30,
+                startY: 30, // Start table below the title and subtitle.
                 theme: 'grid',
                 headStyles: { fillColor: [241, 245, 249], textColor: [20, 20, 20] },
-                styles: { font: 'Inter', fontSize: 12 }, // Ukuran font diubah ke 12
+                styles: { font: 'Inter', fontSize: 12 },
                 margin: { top: 10, right: 10, bottom: 10, left: 10 }
             });
             
-            doc.output('dataurlnewwindow');
+            doc.output('dataurlnewwindow'); // Open the generated PDF in a new tab.
         }
 
-        // Fungsi BARU untuk mengunduh template XLSX
+        // Downloads an XLSX template file for importing student data.
         function downloadTemplate() {
-            // Data header untuk template
             const headers = [
                 "Nama",
                 "Kelas",
@@ -518,36 +565,28 @@
                 "Nomor HP Wali"
             ];
 
-            // Buat array data. Baris pertama adalah header.
-            // Anda bisa menambahkan baris contoh jika mau, misalnya:
-            // const data = [
-            //     headers,
-            //     ["Budi Santoso", "10A", "Ibu Ani", "081234567890"],
-            //     ["Siti Aminah", "11B", "Bapak Budi", "087654321098"]
-            // ];
-            // Untuk template kosong, cukup headers saja:
-            const data = [headers];
+            const data = [headers]; // Only headers for an empty template.
 
-            // Buat worksheet dari array data
+            // Create a new worksheet from the array of arrays.
             const ws = XLSX.utils.aoa_to_sheet(data);
 
-            // Buat workbook baru
+            // Create a new workbook.
             const wb = XLSX.utils.book_new();
-            // Tambahkan worksheet ke workbook dengan nama 'Data Siswa'
+            // Append the worksheet to the workbook with a sheet name.
             XLSX.utils.book_append_sheet(wb, ws, "Data Siswa");
 
-            // Tulis file XLSX dan unduh
+            // Write the XLSX file and trigger download.
             XLSX.writeFile(wb, "template_data_siswa.xlsx");
 
-            alert('Template Excel "template_data_siswa.xlsx" berhasil diunduh.');
+            showMessage('Template Diunduh', 'Template Excel "template_data_siswa.xlsx" berhasil diunduh.');
         }
         
-        // Fungsi handleFileUpload yang diubah untuk XLSX
+        // Handles the upload of an XLSX file to import student data.
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) {
-                alert('Tidak ada file yang dipilih.');
-                event.target.value = ''; // Reset input file
+                showMessage('Peringatan', 'Tidak ada file yang dipilih.');
+                event.target.value = ''; // Reset input file.
                 return;
             }
 
@@ -555,8 +594,8 @@
             const fileExtension = fileName.split('.').pop().toLowerCase();
 
             if (fileExtension !== 'xlsx') {
-                alert('Harap unggah file Excel dengan ekstensi .xlsx.');
-                event.target.value = ''; // Reset input file
+                showMessage('Format File Salah', 'Harap unggah file Excel dengan ekstensi .xlsx.');
+                event.target.value = ''; // Reset input file.
                 return;
             }
 
@@ -566,57 +605,59 @@
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
 
-                const sheetName = workbook.SheetNames[0]; // Ambil sheet pertama
+                const sheetName = workbook.SheetNames[0]; // Get the first sheet.
                 const worksheet = workbook.Sheets[sheetName];
 
+                // Convert worksheet to JSON, treating the first row as headers.
                 const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
 
-                if (jsonData.length < 2) { // Minimal ada header dan satu baris data
-                    alert('File Excel kosong atau tidak memiliki data yang cukup.');
+                if (jsonData.length < 2) { // Minimum: header row + one data row.
+                    showMessage('File Kosong', 'File Excel kosong atau tidak memiliki data yang cukup.');
                     event.target.value = '';
                     return;
                 }
 
-                const headers = jsonData[0]; // Baris pertama adalah header
-                const studentsDataRows = jsonData.slice(1); // Data siswa dimulai dari baris kedua
+                const headers = jsonData[0]; // First row contains headers.
+                const studentsDataRows = jsonData.slice(1); // Student data starts from the second row.
 
-                // VALIDASI HEADER: Pastikan nama header di sini SAMA PERSIS dengan template Anda!
-                const requiredHeaders = ['Nama', 'Kelas', 'Wali', 'Nomor HP Wali'];
+                // Validate required headers: Only 'Nama' and 'Kelas' are mandatory.
+                const requiredHeaders = ['Nama', 'Kelas'];
                 const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
 
                 if (missingHeaders.length > 0) {
-                    alert(`File Excel tidak memiliki kolom yang diperlukan: ${missingHeaders.join(', ')}. Harap gunakan template yang benar.`);
+                    showMessage('Header Tidak Lengkap', `File Excel tidak memiliki kolom yang diperlukan: ${missingHeaders.join(', ')}. Harap gunakan template yang benar.`);
                     event.target.value = '';
                     return;
                 }
 
                 const newStudents = [];
                 let duplicatesFound = 0;
-                // Buat Set dari nama siswa yang sudah ada di database (case-insensitive)
+                // Create a Set of existing student names (case-insensitive) for duplicate checking.
                 const seenNamesInDatabase = new Set(studentDatabase.map(s => s.name.toLowerCase()));
 
                 studentsDataRows.forEach(row => {
-                    // Ambil nilai berdasarkan indeks header
+                    // Get data based on header index.
                     const nameIndex = headers.indexOf('Nama');
                     const classIndex = headers.indexOf('Kelas');
-                    const waliIndex = headers.indexOf('Wali');
-                    const nomorHpWaliIndex = headers.indexOf('Nomor HP Wali');
+                    const waliIndex = headers.indexOf('Wali'); // This will be -1 if 'Wali' column is not present
+                    const nomorHpWaliIndex = headers.indexOf('Nomor HP Wali'); // This will be -1 if 'Nomor HP Wali' column is not present
 
                     const name = row[nameIndex] ? String(row[nameIndex]).trim() : '';
                     const studentClass = row[classIndex] ? String(row[classIndex]).trim() : '';
-                    const wali = row[waliIndex] ? String(row[waliIndex]).trim() : '';
-                    const nomorHpWali = row[nomorHpWaliIndex] ? String(row[nomorHpWaliIndex]).trim() : '';
+                    // If column index is -1 (column not found) or value is empty, default to empty string.
+                    const wali = waliIndex !== -1 && row[waliIndex] ? String(row[waliIndex]).trim() : '';
+                    const nomorHpWali = nomorHpWaliIndex !== -1 && row[nomorHpWaliIndex] ? String(row[nomorHpWaliIndex]).trim() : '';
 
-                    // Validasi dasar: nama dan kelas tidak boleh kosong
+                    // Basic validation: name and class cannot be empty.
                     if (name && studentClass) {
-                        // Cek duplikat di antara data yang sedang diimpor dan yang sudah ada
+                        // Check for duplicates before adding.
                         if (!seenNamesInDatabase.has(name.toLowerCase())) {
-                            seenNamesInDatabase.add(name.toLowerCase()); // Tambahkan ke set agar tidak duplikat dari file yang sama
+                            seenNamesInDatabase.add(name.toLowerCase()); // Add to set to prevent duplicates from the same file.
                             newStudents.push({
                                 name: name,
                                 class: studentClass,
-                                wali: wali, // Sertakan data wali
-                                nomorHpWali: nomorHpWali // Sertakan nomor HP wali
+                                wali: wali,
+                                nomorHpWali: nomorHpWali
                             });
                         } else {
                             duplicatesFound++;
@@ -625,54 +666,60 @@
                 });
 
                 if (newStudents.length > 0) {
-                    // Gabungkan siswa baru dengan database yang sudah ada
+                    // Merge new students with the existing database.
                     studentDatabase = [...studentDatabase, ...newStudents];
-                    saveDataToLocalStorage(); // Simpan perubahan ke localStorage
-                    updateDatabaseInfo(); // Perbarui info tampilan database
-                    alert(`Berhasil mengimpor ${newStudents.length} siswa baru dari file Excel.`);
+                    saveDataToLocalStorage(); // Save changes to local storage.
+                    updateDatabaseInfo(); // Update database info display.
+                    let successMessage = `Berhasil mengimpor ${newStudents.length} siswa baru dari file Excel.`;
                     if (duplicatesFound > 0) {
-                        alert(`${duplicatesFound} data duplikat (nama yang sama) diabaikan.`);
+                        successMessage += `\n${duplicatesFound} data duplikat (nama yang sama) diabaikan.`;
                     }
+                    showMessage('Impor Berhasil', successMessage);
                 } else {
-                    alert('Tidak ada siswa valid yang ditemukan di file Excel untuk diimpor.');
+                    showMessage('Tidak Ada Siswa Valid', 'Tidak ada siswa valid yang ditemukan di file Excel untuk diimpor.');
                 }
-                event.target.value = ''; // Reset input file setelah proses
+                event.target.value = ''; // Reset file input after processing.
             };
 
             reader.onerror = function(ex) {
-                alert('Gagal membaca file. Pastikan format file Excel Anda benar.');
+                showMessage('Error Membaca File', 'Gagal membaca file. Pastikan format file Excel Anda benar.');
                 console.error('File Reader Error:', ex);
-                event.target.value = ''; // Reset input file
+                event.target.value = ''; // Reset input file.
             };
 
             reader.readAsArrayBuffer(file);
         }
 
+        // Handles student search input and displays autocomplete results.
         function handleSearch(e) {
             const query = e.target.value.toLowerCase();
             if (!autocompleteResults) return;
-            autocompleteResults.innerHTML = '';
+            autocompleteResults.innerHTML = ''; // Clear previous results.
+
             if (query.length < 1) {
                 autocompleteResults.classList.add('hidden');
-                // Optional: clear inputs if search query is empty
+                // Clear related inputs and reset selected student if search is empty.
                 if (classInput) classInput.value = '';
                 if (waliInput) waliInput.value = '';
                 selectedStudent = null;
                 if (addButton) addButton.disabled = true;
                 return;
             }
+
+            // Filter student database for matches (up to 10 results).
             const matches = studentDatabase.filter(s => s.name.toLowerCase().includes(query)).slice(0, 10);
+            
             if (matches.length > 0) {
                 autocompleteResults.classList.remove('hidden');
                 matches.forEach(match => {
                     const item = document.createElement('div');
-                    item.className = 'autocomplete-item p-2 hover:bg-sky-500 hover:text-white cursor-pointer';
+                    item.className = 'autocomplete-item p-2 hover:bg-sky-500 hover:text-white cursor-pointer dark:hover:bg-blue-700';
                     item.textContent = `${match.name} (${match.class})`;
+                    // Store full student data in dataset for easy retrieval.
                     item.dataset.name = match.name;
                     item.dataset.class = match.class;
-                    // Simpan data wali dan nomor HP jika ada untuk ditampilkan saat dipilih
-                    if (match.wali) item.dataset.wali = match.wali;
-                    // if (match.nomorHpWali) item.dataset.nomorHpWali = match.nomorHpWali;
+                    item.dataset.wali = match.wali || '';
+                    item.dataset.nomorHpWali = match.nomorHpWali || '';
                     autocompleteResults.appendChild(item);
                 });
             } else {
@@ -680,63 +727,77 @@
             }
         }
         
+        // Selects a student from the autocomplete results and populates the form.
         function selectStudentFromSearch(student) {
             selectedStudent = student;
             if (searchInput) searchInput.value = student.name;
             if (classInput) classInput.value = student.class;
-            if (waliInput) waliInput.value = student.wali || ''; // Tampilkan wali jika ada
+            if (waliInput) waliInput.value = student.wali || ''; // Populate wali if available.
             if (autocompleteResults) autocompleteResults.classList.add('hidden');
-            if (addButton) addButton.disabled = false;
+            if (addButton) addButton.disabled = false; // Enable add button.
         }
 
+        // Adds the selected student to the daily permission queue.
         function addToQueue(event) {
-            event.preventDefault();
-            if (!selectedStudent) { alert('Pilih siswa dari hasil pencarian terlebih dahulu.'); return; }
+            event.preventDefault(); // Prevent form submission.
+            if (!selectedStudent) { 
+                showMessage('Peringatan', 'Pilih siswa dari hasil pencarian terlebih dahulu.'); 
+                return; 
+            }
             const waliName = waliInput.value.trim();
-            if(!waliName) { alert('Nama Orang Tua / Wali harus diisi.'); return; }
+            if(!waliName) { 
+                showMessage('Peringatan', 'Nama Orang Tua / Wali harus diisi.'); 
+                return; 
+            }
+            // Check if student is already in the queue.
             const isAlreadyInQueue = printQueue.some(student => student.name.toLowerCase() === selectedStudent.name.toLowerCase());
             if (isAlreadyInQueue) {
-                alert(`Siswa bernama "${selectedStudent.name}" sudah ada di dalam antrian.`);
+                showMessage('Duplikat Antrian', `Siswa bernama "${selectedStudent.name}" sudah ada di dalam antrian.`);
                 return;
             }
+            // Add student to queue with reason and wali name.
             printQueue.push({ ...selectedStudent, reason: reasonSelect.value, wali: waliName });
-            saveDataToLocalStorage(); // Simpan setelah menambah ke antrian
-            selectedStudent = null;
-            if (searchForm) searchForm.reset();
-            if (addButton) addButton.disabled = true;
-            renderQueue();
-            // Optional: Bersihkan kolom Kelas dan Wali setelah menambah
+            saveDataToLocalStorage(); // Save updated queue.
+            selectedStudent = null; // Clear selected student.
+            if (searchForm) searchForm.reset(); // Reset search form.
+            if (addButton) addButton.disabled = true; // Disable add button.
+            renderQueue(); // Re-render the queue table.
+            // Clear class and wali inputs.
             if (classInput) classInput.value = '';
             if (waliInput) waliInput.value = '';
         }
 
+        // Removes a student from the permission queue by index.
         function removeFromQueue(index) {
-            printQueue.splice(index, 1);
-            saveDataToLocalStorage(); // Simpan setelah menghapus dari antrian
-            renderQueue();
+            printQueue.splice(index, 1); // Remove student from array.
+            saveDataToLocalStorage(); // Save updated queue.
+            renderQueue(); // Re-render the queue table.
         }
 
+        // Resets (clears) the entire daily permission queue.
         function resetQueue() {
             showConfirmation('Hapus Data Hari Ini?', 'Anda yakin ingin menghapus semua data antrian hari ini? Ini tidak akan menghapus database siswa.', () => {
-                printQueue = [];
-                saveDataToLocalStorage(); // Simpan setelah reset antrian
-                renderQueue();
-                alert('Data antrian hari ini telah dihapus.');
+                printQueue = []; // Clear the queue.
+                saveDataToLocalStorage(); // Save empty queue.
+                renderQueue(); // Re-render (will show empty message).
+                showMessage('Data Dihapus', 'Data antrian hari ini telah dihapus.');
             });
         }
 
+        // Deletes the entire student database.
         function deleteDatabase() {
             showConfirmation('Hapus Seluruh Database?', 'PERINGATAN: Aksi ini tidak bisa dibatalkan. Seluruh data siswa yang dimuat akan hilang.', () => {
-                studentDatabase = [];
-                printQueue = []; // Juga reset antrian karena database dihapus
-                saveDataToLocalStorage(); // Simpan setelah menghapus database
-                if (searchInput) searchInput.value = '';
-                updateDatabaseInfo();
-                renderQueue(); // Render ulang antrian (sekarang kosong)
-                alert('Database telah dihapus.');
+                studentDatabase = []; // Clear the student database.
+                printQueue = []; // Also clear the queue as database is gone.
+                saveDataToLocalStorage(); // Save empty database and queue.
+                if (searchInput) searchInput.value = ''; // Clear search input.
+                updateDatabaseInfo(); // Update database info.
+                renderQueue(); // Re-render queue (will be empty).
+                showMessage('Database Dihapus', 'Database telah dihapus.');
             });
         }
 
+        // Adds a new student manually to the student database.
         function addStudentToDatabase(event) {
             event.preventDefault();
             const newNameInput = document.getElementById('manual-nama');
@@ -744,27 +805,35 @@
             if (!newNameInput || !newClassInput) return;
             const newName = newNameInput.value.trim();
             const newClass = newClassInput.value.trim();
-            if (!newName || !newClass) { alert('Nama dan Kelas siswa baru tidak boleh kosong.'); return; }
+
+            if (!newName || !newClass) { 
+                showMessage('Input Kosong', 'Nama dan Kelas siswa baru tidak boleh kosong.'); 
+                return; 
+            }
+            // Check for duplicate names in the database.
             if (studentDatabase.some(s => s.name.toLowerCase() === newName.toLowerCase())) {
-                alert('Siswa dengan nama ini sudah ada di database.');
+                showMessage('Duplikat Siswa', 'Siswa dengan nama ini sudah ada di database.');
                 return;
             }
-            studentDatabase.push({ name: newName, class: newClass, wali: '', nomorHpWali: '' }); // Tambahkan default wali/nomor hp
-            saveDataToLocalStorage(); // Simpan setelah menambah siswa manual
-            updateDatabaseInfo();
-            alert(`Siswa "${newName}" berhasil ditambahkan.`);
-            if (manualAddForm) manualAddForm.reset();
-            if (manualAddModal) manualAddModal.classList.add('hidden');
+            // Add new student with default empty wali/nomorHpWali.
+            studentDatabase.push({ name: newName, class: newClass, wali: '', nomorHpWali: '' });
+            saveDataToLocalStorage(); // Save updated database.
+            updateDatabaseInfo(); // Update database info display.
+            showMessage('Siswa Ditambahkan', `Siswa "${newName}" berhasil ditambahkan ke database.`);
+            if (manualAddForm) manualAddForm.reset(); // Reset manual add form.
+            if (manualAddModal) manualAddModal.classList.add('hidden'); // Hide modal.
         }
 
+        // Updates the display showing the number of students in the database.
         function updateDatabaseInfo() {
             if (databaseInfo) databaseInfo.textContent = `${studentDatabase.length} siswa di database.`;
             if (searchInput) {
-                searchInput.disabled = studentDatabase.length === 0;
-                if(studentDatabase.length > 0) searchInput.focus();
+                searchInput.disabled = studentDatabase.length === 0; // Enable/disable search based on database size.
+                if(studentDatabase.length > 0) searchInput.focus(); // Focus search if database has students.
             }
         }
         
+        // Updates the displayed active date.
         function updateDateDisplay() {
             if (!activeDateDisplay) return;
             activeDateDisplay.textContent = activeDate.toLocaleDateString('id-ID', {
@@ -772,41 +841,56 @@
             });
         }
         
+        // Applies the selected theme (light/dark) to the document.
         function applyTheme(theme) {
             if (theme === 'dark') {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
-            localStorage.setItem('appTheme', theme);
+            localStorage.setItem('appTheme', theme); // Save theme preference.
             const themeRadio = document.querySelector(`input[name="theme-setting"][value="${theme}"]`);
-            if(themeRadio) themeRadio.checked = true;
+            if(themeRadio) themeRadio.checked = true; // Set the correct radio button.
         }
 
         // --- EVENT LISTENERS ---
+        // Toggle submenu visibility.
         if (menuDatabase) menuDatabase.addEventListener('click', () => {
             if (submenuDatabase) submenuDatabase.classList.toggle('open');
             menuDatabase.classList.toggle('active');
         });
+        // Handle XLSX file upload.
         if (fileInput) fileInput.addEventListener('change', handleFileUpload);
+        // Download XLSX template.
         if (downloadTemplateButton) downloadTemplateButton.addEventListener('click', downloadTemplate);
+        // Delete entire student database.
         if (deleteDatabaseButton) deleteDatabaseButton.addEventListener('click', deleteDatabase);
+        // Handle search input for autocomplete.
         if (searchInput) searchInput.addEventListener('input', handleSearch);
+        // Add selected student to queue on form submission.
         if (searchForm) searchForm.addEventListener('submit', addToQueue);
+        // Reset daily queue.
         if (resetQueueButton) resetQueueButton.addEventListener('click', resetQueue);
+        // Print report PDF.
         if (printPdfButton) printPdfButton.addEventListener('click', generateReportPDF);
+        // Print individual slips PDF.
         if (printSlipsButton) printSlipsButton.addEventListener('click', generateSlipsPDF);
         
+        // Handle manual add student form submission.
         if (manualAddForm) manualAddForm.addEventListener('submit', addStudentToDatabase);
+        // Open manual add modal.
         if (openManualAddModalBtn) openManualAddModalBtn.addEventListener('click', () => {
             manualAddModal.classList.remove('hidden');
-            document.getElementById('manual-nama').focus(); // Fokus ke input pertama
+            document.getElementById('manual-nama').focus(); // Focus on first input.
         });
+        // Close manual add modal.
         if (closeModalBtn) closeModalBtn.addEventListener('click', () => manualAddModal.classList.add('hidden'));
+        // Close manual add modal when clicking outside.
         if (manualAddModal) manualAddModal.addEventListener('click', (e) => {
             if (e.target === manualAddModal) manualAddModal.classList.add('hidden');
         });
 
+        // Event delegation for removing students from the queue.
         if (queueContainer) queueContainer.addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('remove-queue-btn')) {
                 const index = parseInt(e.target.dataset.index, 10);
@@ -814,85 +898,102 @@
             }
         });
         
+        // Event delegation for selecting autocomplete results.
         if (autocompleteResults) autocompleteResults.addEventListener('click', function(e) {
             if (e.target && e.target.classList.contains('autocomplete-item')) {
-                // Pastikan untuk mengambil semua data yang relevan dari dataset
+                // Construct student object from dataset attributes.
                 const student = {
                     name: e.target.dataset.name,
                     class: e.target.dataset.class,
-                    wali: e.target.dataset.wali || '', // Ambil wali jika ada
-                    // nomorHpWali: e.target.dataset.nomorHpWali || '' // Jika ada
+                    wali: e.target.dataset.wali || '',
+                    nomorHpWali: e.target.dataset.nomorHpWali || ''
                 };
                 selectStudentFromSearch(student);
             }
         });
 
+        // Hide autocomplete results when clicking outside the search form.
         document.addEventListener('click', (e) => {
             if (searchForm && !searchForm.contains(e.target) && autocompleteResults) {
                 autocompleteResults.classList.add('hidden');
             }
         });
 
+        // Handle OK button click in the confirmation/message modal.
         if (confirmOkBtn) confirmOkBtn.addEventListener('click', () => {
-            if (typeof onConfirmCallback === 'function') {
-                onConfirmCallback();
+            // Check if it's a simple message (cancel button hidden) or a confirmation.
+            if (confirmCancelBtn.classList.contains('hidden')) { 
+                hideConfirmation(); // Just close for messages.
+            } else { 
+                if (typeof onConfirmCallback === 'function') {
+                    onConfirmCallback(); // Execute callback for confirmations.
+                }
+                hideConfirmation();
             }
-            hideConfirmation();
         });
+        // Handle Cancel button click in the confirmation modal.
         if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', hideConfirmation);
 
         // Settings Modal Listeners
+        // Open settings modal.
         if(openSettingsModalBtn) openSettingsModalBtn.addEventListener('click', () => {
             settingsModal.classList.remove('hidden');
-            // Pastikan radio button yang benar terpilih saat modal dibuka
+            // Set radio buttons based on current settings.
             document.querySelector(`input[name="date-setting"][value="${dateMode}"]`).checked = true;
             if (dateMode === 'manual') {
                 manualDateInput.classList.remove('hidden');
+                manualDateInput.valueAsDate = activeDate || new Date(); // Set manual date input to current active date.
             } else {
                 manualDateInput.classList.add('hidden');
             }
             document.querySelector(`input[name="theme-setting"][value="${currentTheme}"]`).checked = true;
         });
+        // Close settings modal.
         if(closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+        // Close settings modal when clicking outside.
         if(settingsModal) settingsModal.addEventListener('click', (e) => {
             if(e.target === settingsModal) settingsModal.classList.add('hidden');
         });
 
+        // Handle date setting radio button changes.
         dateSettingRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 dateMode = e.target.value;
                 if (dateMode === 'manual') {
                     manualDateInput.classList.remove('hidden');
-                    // Set manual date input to activeDate if it was previously auto, or current date if empty
-                    manualDateInput.valueAsDate = activeDate || new Date(); 
-                    activeDate = manualDateInput.valueAsDate; // Set activeDate ke manual date
+                    manualDateInput.valueAsDate = activeDate || new Date(); // Set manual date input.
+                    activeDate = new Date(manualDateInput.valueAsDate.getTime() + manualDateInput.valueAsDate.getTimezoneOffset() * 60000); // Adjust for timezone
                 } else {
                     manualDateInput.classList.add('hidden');
-                    activeDate = new Date(); // Kembali ke tanggal hari ini
+                    activeDate = new Date(); // Revert to today's date.
                 }
-                updateDateDisplay();
+                updateDateDisplay(); // Update displayed date.
             });
         });
         
+        // Handle manual date input change.
         if(manualDateInput) manualDateInput.addEventListener('change', (e) => {
             const selectedDate = new Date(e.target.value);
-            // Tambahkan offset zona waktu untuk memastikan tanggal yang benar
+            // Adjust for timezone offset to ensure correct date.
             const timezoneOffset = selectedDate.getTimezoneOffset() * 60000; 
             activeDate = new Date(selectedDate.getTime() + timezoneOffset);
-            updateDateDisplay();
+            updateDateDisplay(); // Update displayed date.
         });
         
+        // Handle theme setting radio button changes.
         themeSettingRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 currentTheme = e.target.value;
-                applyTheme(currentTheme);
+                applyTheme(currentTheme); // Apply the selected theme.
             });
         });
 
         // --- INITIALIZATION ---
+        // Ensures the app initializes correctly after the DOM is fully loaded.
         setInitialUIState();
     }
 
+    // Check if the DOM is already loaded. If not, wait for DOMContentLoaded.
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializeApp);
     } else {
